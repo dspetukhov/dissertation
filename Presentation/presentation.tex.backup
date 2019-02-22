@@ -1,0 +1,2266 @@
+\documentclass[a4paper, 9pt]{beamer}
+\usepackage[T2A]{fontenc}
+\usepackage[english,russian]{babel}
+
+% \graphicspath{{images/}}
+
+\usepackage{csquotes, xcolor}
+\usepackage{booktabs}
+\usepackage[customcolors,shade]{hf-tikz}
+\definecolor{mLightBlue}{HTML}{4D59F6}
+\definecolor{pGray}{HTML}{949ea0}
+\definecolor{pGreen}{HTML}{008000}
+
+\usetheme{metropolis} 
+
+\addto\captionsrussian{ 
+\def\figurename{Рисунок} 
+}
+
+\usepackage[%
+backend=biber,% движок
+bibencoding=utf8,% кодировка bib файла
+sorting=none,% настройка сортировки списка литературы
+maxbibnames=3, % Максимальное число авторов в списке литературы.
+minbibnames=3,
+style=gost-numeric,% стиль цитирования и библиографии (по ГОСТ)
+language=english,% получение языка из babel/polyglossia
+autolang=other,% 
+clearlang=true,% 
+defernumbers=true,% 
+sortcites=true,% 
+]{biblatex}
+\addbibresource{../../TeX/biblio/literature.bib}
+\NewBibliographyString{langjapanese}
+\NewBibliographyString{fromjapanese}
+%\newcommand{\itemi}{\item[\checkmark]}
+
+%\newtotcounter{citenum}
+\makeatletter
+
+\defbibenvironment{counter}
+  {\setcounter{citenum}{0}
+  \renewcommand{\blx@driver}[1]{}
+  }
+  {} %\thecitenum сюда писать не надо
+  {\stepcounter{citenum}}
+
+\@addtoreset{figure}{framenumber}
+\@addtoreset{equation}{framenumber}
+% \setcounter{subfigure}{0}
+\makeatother
+\defbibheading{counter}{}
+
+\DeclareSourcemap{
+    \maps{
+        \map[overwrite]{% стираем значения всех полей issn
+            \step[fieldset=doi, null]
+        }
+        \map[overwrite]{% стираем значения всех полей issn
+            \step[fieldset=issn, null]
+        }
+    }
+}
+
+\newcommand\invisiblesection[1]{%
+  \refstepcounter{section}%
+  \addcontentsline{toc}{section}{\protect\numberline{\thesection}#1}%
+  \sectionmark{#1}}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes.geometric,calc,chains}
+\usepackage{caption}
+\captionsetup[figure]{labelfont={bf},name={\footnotesize Рисунок},labelsep=endash}%period}
+\captionsetup[table]{labelfont={bf},name={\footnotesize Таблица},labelsep=endash}%period}
+
+\newcommand{\mycirc}[1]{\tikz{\path[draw=black,fill=#1,line width=0.25] (0,0) circle [radius=0.09];}} % --(0.525,0.25)--(0,0.5)--cycle;}}
+\newcommand{\myrec}[1]{\tikz{\path[draw=black,fill=#1,line width=0.25] (0,0) rectangle (0.12,0.20);}} % --(0.525,0.25)--(0,0.5)--cycle;}}
+
+\usetikzlibrary{arrows.meta}
+\tikzset{
+>=stealth',
+punkt/.style={
+           rectangle,
+           rounded corners,
+           draw=black, thick,
+           text width=6.5em,
+           minimum height=2em,
+           text centered},
+    pil/.style={
+           ->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,}
+double arrow/.style args={#1 colored by #2 and #3}{
+    -stealth,line width=#1,#2, % first arrow
+    postaction={draw,-stealth,#3,line width=(#1)/3,
+                shorten <=(#1)/3,shorten >=2*(#1)/3}, % second arrow
+  }
+}
+\usepackage[export]{adjustbox}
+
+\title{\large Структурно-параметрическая идентификация \\\vskip0.3ex имплантируемых роторных насосов крови в \\аппаратах вспомогательного кровообращения}%Идентификация и управление\\ имплантируемым роторным насосом крови\\ в аппаратах вспомогательного кровообращения} % Методы и алгоритмы управления работой имплантируемого роторного насоса крови для аппаратов вспомогательного кровообращения}
+\author{\vskip-1.0ex 05.13.01 --  Системный анализ, управление и обработка информации \\(технические системы) \\\vskip1.01ex Диссертация на соискание ученой степени кандидата технических наук \\\vskip1.1ex Научный руководитель: д.ф.-м.н., профессор Селищев С. В.}
+\date{\vskip2.5ex Москва -- 2018}
+
+%\author{Национальный исследовательский университет \\ <<Московский институт электронной техники>> \vskip1.0ex ПЕТУХОВ Дмитрий Сергеевич \vskip1.0ex 05.13.01 -- Системный анализ, управление и обработка информации \vskip1.0ex Диссертация на соискание учёной степени кандидата технических наук}
+
+\institute{Министерство образования и науки Российской Федерации \\\vskip1.0ex Федеральное государственное автономное образовательное учреждение высшего образования «Национальный исследовательский университет <<Московский институт электронной техники>> \\\vskip4.0ex \textbf{\normalsize Петухов Дмитрий Сергеевич} \vskip2.0ex}
+
+\begin{document}
+
+\maketitle
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}{Аппараты вспомогательного кровообращения -- сложная система}
+
+\begin{minipage}[ht]{0.48\textwidth}
+\begin{figure}
+\center{\includegraphics[width=0.72\linewidth]{../images/vad_system}}
+\caption{\scriptsize Пример поддержки кровообращения с использованием аппарата вспомогательного кровообращения (АВК); РНК -- роторный насос крови}
+\end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.48\textwidth}
+\begin{figure}
+\center{\includegraphics[width=0.95\linewidth]{../images/system_links}}
+\caption{\scriptsize Обобщенная схема поддержки кровообращения с помощью АВК; \\ $Q$ -- расход насоса \\$H$ -- перепад давления в насосе \\$\omega$ -- скорость вращения ротора насоса \\$t$ -- время}
+\end{figure}
+\end{minipage}
+
+\footnotesize
+\begin{itemize}
+ \item АВК -- сложная техническая система, предназначенная для поддержки кровообращения у пациентов с тяжелой формой сердечной сердечной недостаточности,
+ \item С целью управления требуется представление РНК в виде математической модели с определением ее структуры и числовых значений коэффициентов математической модели согласно экспериментальным данным, т. е. \underline{структурно-параметрическая} \underline{идентификация}.
+\end{itemize}
+
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% 
+% \begin{frame}{Трасплантация сердца}
+% 
+% % \begin{minipage}[ht]{0.48\textwidth}
+% % \begin{figure}
+% % \center{\includegraphics[width=0.90\linewidth]{ht_example_11}}
+% % \caption{\small Количество трансплантаций сердца в мире (\footnotesize по данным International Society for Heart and Lung Transplantation -- ISHLT)} % добавить значения индексов
+% % \end{figure}
+% % \end{minipage}
+% % \hfill
+% % \begin{minipage}[ht]{0.48\textwidth}
+% \begin{figure}
+% \center{\includegraphics[width=0.85\linewidth]{ht_trend}}
+% \caption{\small Количество трансплантаций сердца в России (\myrec{red}) и США (\myrec{blue}) (\footnotesize по данным Международного регистра органного донорства и трансплантологии -- The International Registry of Organ Donation and Transplantation -- IRODaT) }
+% \end{figure}
+% %\end{minipage}
+% \vskip-10pt
+% \begin{figure}
+% \center{\includegraphics[width=0.85\linewidth]{vad_trend}}
+% \caption{\small Количество имплантаций аппаратов вспомогательного кровообращения (\footnotesize по данным Interagency Registry for Mechanically Assisted Circulatory Support -- INTERMACS) }
+% \end{figure}
+% 
+% \end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}{Имплантируемые РНК в аппаратах вспомогательного кровообращения}
+
+\begin{minipage}[ht]{0.52\textwidth}
+\footnotesize% \emph{Аппараты вспомогательного кровообращения} (АВК) -- альтернатива трансплантации сердца.
+
+%\vskip8pt
+Основные элементы АВК:
+\begin{itemize}
+ \item \alert{Роторный насос крови (РНК)}
+ \item Модуль электронного управления
+ \item Информационный модуль
+ \item Зарядное устройство с батареями
+\end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.47\textwidth}
+%\vskip-10pt
+\begin{figure}
+ \includegraphics[scale=0.165]{../images/hm_3_pres}
+ \caption*{\footnotesize АВК HeartMate 3 (Thoratec Corp., США)} 
+\end{figure}
+\end{minipage}
+\vfill
+\begin{minipage}[ht]{.28\textwidth}
+\centering
+
+\vskip-14pt
+\begin{figure}
+  \center
+  \includegraphics[scale=0.75]{../images/hm_2_pres}
+  \caption*{\footnotesize АВК HeartMate 2 (США)} 
+\end{figure}
+
+\end{minipage}\hfill
+\begin{minipage}[ht]{.36\textwidth}
+\centering
+
+\begin{figure}
+ \includegraphics[scale=0.5]{../images/sputnik_pres}
+ \caption*{\footnotesize АВК Спутник (Россия)} 
+\end{figure}
+
+\end{minipage}\hfill
+\begin{minipage}[ht]{.34\textwidth}
+\centering \vskip-5pt
+
+\begin{figure}
+ \includegraphics[scale=0.23]{../images/hvad_pres}
+ \caption*{\footnotesize АВК HVAD (HeartWare, США)} 
+\end{figure}
+
+\end{minipage}
+
+% 
+% 
+% \centering
+% %\stepcounter{figure}\addtocounter{figure}{-1}  %This resets the counter of the subfigures
+% 
+% \subfloat[t1]{\label{main:ab}\includegraphics[width=3cm]{css_pump}}%\par\medskip
+% \subfloat[t2]{\label{main:ac}\includegraphics[width=3cm]{images/Sputnik_part1}}%\par\medskip
+% \subfloat[t3]{\label{main:ad}\includegraphics[width=3cm]{images/hvad}}
+% 
+% % %\vskip-30pt
+% % \begin{figure}
+% %  \includegraphics[scale=0.60]{images/Sputnik_part1}
+% %  \caption*{\footnotesize АВК Спутник (Россия)} 
+% % \end{figure}
+% % \end{minipage}
+% % \hfill
+% % \begin{minipage}[ht]{0.31\textwidth}
+% %  
+% % \end{minipage}
+% % \hfill
+% % \begin{minipage}[ht]{0.31\textwidth}
+% % \vskip-5pt
+% % \begin{figure}
+% %  \includegraphics[scale=0.25]{images/hvad}
+% %  \caption*{\footnotesize АВК HVAD (HeartWare, США)} 
+% % \end{figure}
+% \end{minipage}\par\medskip
+
+\begin{tikzpicture}[overlay]
+\draw[rounded corners, mLightBlue, opacity=0.5, line width=0.75 ] (7.0, 2.25) rectangle (8.65,3.70);
+\draw[rounded corners, mLightBlue, opacity=0.6, line width=0.75 ] (3.96, 1.54) rectangle (4.82,2.05);
+\draw[rounded corners, mLightBlue, opacity=0.5, line width=0.75 ] (9.2, 6.45) rectangle (10.0,6.85);
+
+\draw[rounded corners, mLightBlue, opacity=0.65, line width=0.75 ] (1.55, 2.45) rectangle (2.22,2.85);
+
+\end{tikzpicture}
+
+% \only<2>{
+% %
+% \frametitle{Лечение сердечной недостаточности: трансплантация сердца и АВК}
+% \begin{minipage}[ht]{0.48\textwidth}
+% \begin{figure}
+%   \center
+%   \includegraphics[scale=1.01]{css_original}
+%   \caption{Трансплантация сердца} 
+% \end{figure}
+% \begin{tikzpicture}[overlay]
+%     \draw (4.8, 4.80) node {\footnotesize Донорское };
+%     \draw (5.05, 4.50) node {\footnotesize сердце};
+% 	\path[-stealth, color=red, line width=1.0] (3.75,3.3) edge [bend left=20] (2.45,3.3);
+% \end{tikzpicture}
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.48\textwidth}
+% \begin{figure}
+%   \center
+%   \includegraphics[scale=0.8]{css_pump}
+%   \caption{Имплантация РНК} 
+% \end{figure}
+% \begin{tikzpicture}[overlay]
+% 	\path[-stealth, color=mLightBlue, line width=1.0] (1.05,2.1) edge [bend left=20] (2.05,3.45);
+% 
+% 	\path[-stealth, color=red, line width=1.0] (4.2,2.2) edge [bend right=30] (2.95,3.8);
+% 	\path[-stealth, color=red, line width=1.0] (4.2,5.3) edge [bend right=20] (2.45,4.7);
+% 
+% 	\path[-stealth, color=red, line width=1.0] (2.95,2.95) edge [bend right=0] (2.35,2.95);
+% 
+%     \draw (4.5, 5.45) node {\footnotesize Аорта };
+%     \draw (4.75, 2.25) node [align=right] { \footnotesize Левый };
+%     \draw (4.55, 1.925) node [align=right] { \footnotesize желудочек };
+%     \draw (4.75, 1.65) node [align=right] { \footnotesize сердца };
+% 
+%     \draw (1.00, 1.90) node [align=right] { \footnotesize Правый };
+%     \draw (1.15, 1.6) node [align=right] { \footnotesize желудочек };
+%     \draw (0.95, 1.30) node [align=right] { \footnotesize сердца };
+% 
+% \end{tikzpicture}
+% \end{minipage}
+% }
+
+% \only<3>{
+% \begin{minipage}[ht]{0.48\textwidth}
+% 	\center{\includegraphics[scale=0.8]{images/css_original}} 
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.48\textwidth}
+% 	\center{\includegraphics[scale=0.8]{css_pump}}
+% \end{minipage}
+% }
+
+% Альтернатива -- аппараты вспомогательного кровообращения, представленные так-то; лечение происходит таким-то образом, работает все это так-то
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}{Проблема идентификации имплантируемых роторных насосов крови}
+\small
+
+\underline{Управление} -- одно из ключевых направлений развития технологии вспомогательного кровообращения \footnotemark[1]$^, $\footnotemark[2], которое: 
+\vskip-5pt
+\begin{itemize}
+ \item \footnotesize нацелено на поддержание достаточного уровня кровообращения в сердечно-сосудистой системе,
+ \item должно предотвращать нежелательные состояния в сердечно-сосудистой системе.
+\end{itemize}
+
+\footnotesize
+\vskip-4pt
+Управлению РНК посвящено множество работ российских и зарубежных авторов \footnotemark[1]$^, $\footnotemark[3]. 
+
+\vskip-1pt
+Эффективное управление РНК требует точной \underline{идентификации} -- построения математической модели по экспериментальным данным \footnotemark[4].
+
+\vskip-2pt
+Проблемы идентификации:
+\vskip-6pt
+\begin{itemize}
+ \item \footnotesize не существует универсального и общепринятого способа идентификации и критериев, по которым оценивается эффективность идентификации для управления РНК \footnotemark[5],
+ \begin{itemize}
+  \item \footnotesize многообразие имплантируемых роторных насосов крови
+  \item РНК -- сложная система \footnotemark[6]
+ \end{itemize}
+ \item необходимо учитывать взаимодействие имплантируемого РНК с сердечно-сосудистой системой.
+\end{itemize}
+%работа насоса исследуется без учета либо вязкости жидкости \footnotemark[1], либо инерции жидкости \footnotemark[2], либо не учитываются оба эффекта \footnotemark[3],
+% \item направленность на определение только одного состояния в сердечно-сосудистой системе, например, состояния аортального клапана \footnotemark[4],
+% \item коллапс желудочка сердца рассматривается как состояние, связанное с разрежением камеры желудочка и определяемое как резкое уменьшение сигналов насоса либо превышение заданного порогового значения \footnotemark[2]$^,$\footnotemark[5],
+% \item алгоритмы управления поддерживают производительность насоса в соответствии с потребностями организма, которые не определены \footnotemark[5]$^,$\footnotemark[6].
+% \item имплантируемый роторный насос крови в АВК является сложной системой \footnotemark[3], 
+
+
+\vskip5pt
+
+\footnotetext[1]{\tiny ~\textit{AlOmari A.-H. H., Savkin A. V., Stevens M. et al.} Developments in control systems for rotary left ventricular assist devices for heart failure patients: a review \textcolor{pGray}{// Physiological Measurement. 2013. Vol. 34, no. 1. P. 1--27.} }
+
+\footnotetext[2]{\tiny ~\textit{Petukhov D. S., Telyshev D. V.} Control algorithms for rotary blood pumps used in assisted circulation \textcolor{pGray}{// Biomedical Engineering. 2016. Vol. 50, no. 3. P. 157-160.} }
+
+\footnotetext[3]{\tiny ~\textit{Дозоров К. Н., Иткин Г. П., Адаскин А. В.} Система косвенных измерений для задач управления роторными насосами крови \textcolor{pGray}{// Медицинская техника. 2010. № 6. С. 16-19.} }
+
+\footnotetext[4]{\tiny ~\textit{Гроп Д.} Методы идентификации систем \textcolor{pGray}{Мир, 1979.} }
+
+\footnotetext[5]{\tiny ~\textit{Pirbodaghi T., Weber A., Carrel T., Vandenberghe S.} Effect of Pulsatility on the Mathematical Modeling of Rotary Blood Pumps \textcolor{pGray}{// Artificial Organs. 2011. Vol. 35, no. 8. P. 825-832.} }
+
+%\footnotetext[5]{\tiny ~\textit{Moscato F., Danieli G. A., Schima H.} Dynamic modeling and identification of an axial flow ventricular assist device \textcolor{pGray}{// The International Journal of Artificial Organs. 2009. Vol. 32, no. 6. P. 336-343.} }
+
+\footnotetext[6]{\tiny ~\textit{Bertram C.} Measurement for implantable rotary blood pumps \textcolor{pGray}{// Physiological measurement. 2005. Vol. 26, no. 4. P. 99--117.} }
+
+%\footnotetext[3]{\scriptsize ~\textit{Иткин Г.П., Филатов И.А., Дозоров К.Н., Адаскин А.В.} Косвенные методы определения расхода и напора роторных насосов для крови \textcolor{pGray}{// Вестник трансплантологии и искусственных органов. 2015. Т. 17, С. 97--102.} }
+
+%\footnotetext[4]{\scriptsize ~\textit{Rich J. D., Burkhoff D.} HVAD Flow Waveform Morphologies: Theoretical Foundation and Implications for Clinical Practice \textcolor{pGray}{// ASAIO journal. 2017.} }
+
+% \footnotetext[3]{\scriptsize ~\textit{Быков И.В., Иткин Г.П.} Оценка состояния аортального клапана при механической поддержке кровообращения с использованием математической модели \textcolor{pGray}{// Вестник трансплантологии и искусственных органов. 2014. Т. 16, С. 62--67.} }
+
+%\footnotetext[5]{\scriptsize ~\textit{Granegger M, Schima H, Zimpfer D, Moscato F.} Assessment of Aortic Valve Opening During Rotary Blood Pump Support Using Pump Signals \textcolor{pGray}{// Artificial Organs. 2014. Vol. 38, no. 4. P. 290--297.} }
+
+%\footnotetext[6]{\scriptsize ~\textit{Wang Y., Koenig S. C., Slaughter M. S., Giridharan G. A.} Rotary Blood Pump Control Strategy for Preventing Left Ventricular Suction \textcolor{pGray}{// ASAIO Journal. 2015. Vol. 61, no. 1. P. 21--30.} }
+
+%\footnotetext[7]{\scriptsize ~\textit{Дозоров К.Н., Иткин Г.П., Адаскин А.В.} Система косвенных измерений для задач управления роторными насосами крови \textcolor{pGray}{// Медицинская техника. 2010. Т. 6, С. 16--19.} }
+
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}{Цель и задачи диссертационной работы}
+\small
+\textbf{Цель}: разработка и исследование способов структурно-параметрической идентификации имплантируемых роторных насосов крови для повышения эффективности идентификации и управления имплантируемыми роторными насосами крови в аппаратах вспомогательного кровообращения.
+
+В~соответствии с целью диссертационной работы поставлены следующие \textbf{задачи}:
+\small
+
+\begin{enumerate}
+  \item Разработка математической модели идентификации имплантируемого роторного насоса крови на основе расходно-напорных характеристик.
+  \item Разработка математической модели сердечно-сосудистой системы с учетом имплантации роторного насоса крови.
+  \item Исследование взаимодействия имплантируемого роторного насоса крови и сердечно-сосудистой системы методами математического моделирования и анализ результатов исследования с целью повышения эффективности идентификации и управления имплантируемым роторным насосом крови.
+  \item Исследование взаимодействия имплантируемого роторного насоса крови и сердечно-сосудистой системы с использованием экспериментальных данных для роторных насосов крови Спутник с целью верификации результатов математического моделирования.
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Положения, выносимые на защиту}
+\small
+
+\begin{enumerate}
+  \item Предложены критерии, которые позволяют оценить эффективность идентификации для управления имплантируемыми роторными насосами крови в аппаратах вспомогательного кровообращения.
+  \item Разработанный алгоритм структурно-параметрической идентификации позволяет построить математические модели имплантируемых роторных насосов крови в соответствии с критериями оценки эффективности идентификации.
+  \item Построенные математические модели имплантируемых роторных насосов крови позволяют определить переходы между следующими режимами работы насоса: обратное течение через насос, частичная и полная разгрузка желудочка сердца, и коллапс желудочка сердца.
+  \item Разработанный способ управления имплантируемым роторным насосом крови позволяет поддерживать заданный уровень расхода насоса и предотвращать следующие нежелательные режимы работы насоса: обратное течение через насос, полная разгрузка желудочка сердца и коллапс желудочка сердца. 
+\end{enumerate}
+
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}{Разработка модели идентификации имплантируемого РНК}
+\scriptsize
+\vskip-3pt
+Экспериментальные данные -- расходно-напорные характеристики (РНХ) имплантируемого роторного насоса крови HeartMate II \footnotemark[1]$^, $\footnotemark[2]
+\vskip-7pt
+\begin{minipage}[ht]{0.48\textwidth}
+\begin{figure}
+\center{\includegraphics[width=0.55\linewidth]{../images/c2_basic_hq_static}} \vskip-5pt
+\caption{\scriptsize РНХ насоса HeartMate II \footnotemark[1]}
+\end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.48\textwidth}
+\vskip2pt
+\begin{figure}
+\center{\includegraphics[width=0.55\linewidth]{../images/c2_basic_hq_static_viscosity}} \vskip-5pt
+\caption{\scriptsize РНХ насоса HeartMate II при различных величинах вязкости жидкости \footnotemark[2]}
+\end{figure}
+
+\end{minipage}
+\vskip-11pt
+Структура математической модели для описания РНХ согласно работам \footnotemark[3]$^, $\footnotemark[4]:
+
+\vskip-11pt
+\begin{equation}
+	L\frac{dQ}{dt} = (a_1\mu+a_2)Q + (b_1\mu+b_2)\omega^2 + H,
+\end{equation}
+
+\vskip-7pt
+\tiny где $L$ -- параметр, характеризующий инерцию жидкости в насосе \footnotemark[4], $Q$ -- расход насоса, $\mu$ -- параметр, характеризующий вязкость жидкости в насосе, $\omega$ -- скорость вращения ротора насоса, $H$ -- перепад давления в насосе, $a$ и $b$ -- коэффициенты.
+
+\vskip-4pt
+\scriptsize
+\underline{Критерий оценки эффективности идентификации} -- коэффициент детерминации $R^2$:
+
+\vskip-10pt
+\begin{equation}
+	R^2 = 1- \frac{{\scriptstyle \sum\limits_{i=1}^n} (Q_i - \hat{Q_i})^2}{{\scriptstyle \sum\limits_{i=1}^n} (Q_i - \widetilde{Q_i})^2}, ~~~~\widetilde{Q_i} = \frac{1}{n} \sum\limits_{i=1}^n Q_i
+\end{equation}
+\vskip-8pt
+
+\tiny 
+$R^2$ характеризует долю дисперсии $Q$, объясненную моделью идентификации; чем выше значение $R^2$, тем больше соответствие модели данным и точнее описание объекта управления.
+
+\vskip5pt
+\footnotetext[1]{\tiny ~\textit{Pennings K. A., Martina J. R., Rodermans B. F. et al.} Pump Flow Estimation From Pressure Head and Power Uptake for the HeartAssist5, HeartMate II, and HeartWare VADs \textcolor{pGray}{// ASAIO Journal. 2013. Vol. 59, no. 4. P. 420-426.} }
+\footnotetext[2]{\tiny ~\textit{Stanfield J., Selzman C.} Pressure Sensitivity of Axial-Flow and Centrifugal-Flow Left Ventricular Assist Devices \textcolor{pGray}{// Cardiovascular Engineering and Technology. 2012. Vol. 3, no. 4. P. 413-423.} }
+\footnotetext[3]{\tiny ~\textit{Pirbodaghi T., Weber A., Carrel T., Vandenberghe S.} Effect of Pulsatility on the Mathematical Modeling of Rotary Blood Pumps \textcolor{pGray}{// Artificial Organs. 2011. Vol. 35, no. 8. P. 825-832.} }
+\footnotetext[4]{\tiny ~\textit{Moscato F., Danieli G. A., Schima H.} Dynamic modeling and identification of an axial flow ventricular assist device \textcolor{pGray}{// The International Journal of Artificial Organs. 2009. Vol. 32, no. 6. P. 336-343.} }
+
+\end{frame}
+
+% -------------------------------------------------------------------------------
+
+\begin{frame}{Структурно-параметрическая идентификация имплантируемого РНК}
+\tiny
+
+\begin{minipage}[ht]{0.35\textwidth} 
+
+\emph{РНХ математических моделей} \\ при различных $R^2$:
+
+\vskip-6pt
+\begin{figure}
+\center{\includegraphics[width=0.75\linewidth]{../images/static_model_initial_pres}}
+\vskip-6pt
+\caption{\tiny Моделируемые РНХ \\ с $R^2 =$ 0,9566}
+\end{figure}
+
+\vskip-12pt
+\begin{figure}
+\center{\includegraphics[width=0.75\linewidth]{../images/static_model_updated_pres}}
+\vskip-6pt
+\caption{\tiny Моделируемые РНХ \\ с $R^2 =$ 0,9738}
+\end{figure}
+
+\vskip-12pt
+\begin{figure}
+\center{\includegraphics[width=0.75\linewidth]{../images/static_model_final_pres}}
+\vskip-6pt
+\caption{\tiny Моделируемые РНХ \\ с $R^2 =$ 0,9987}
+\end{figure}
+
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.62\textwidth}
+
+\vskip-6pt
+\underline{\textbf{Алгоритм структурно-параметрической идентификации}}: \vskip0pt
+
+$R^2 \geq$ 0,9980 -- критерий оценки эффективности идентификации
+
+Структура исходного уравнения:
+
+\vskip-7pt
+\begin{equation}
+	LdQ/dt =  (a_1\mu+a_2)Q + (b_1\mu+b_2)\omega^2 + H.
+\end{equation}
+
+\vskip-5pt
+\begin{tikzpicture}[node distance=0.8cm,overlay]
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=1.2cm, minimum height=0.6cm,text centered, draw=black, fill=gray!10,xshift=2.5cm,yshift=-5.2]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=0.9cm, minimum height=0.6cm, text centered, draw=black, fill=gray!10]
+\tikzstyle{process} = [rectangle, minimum width=1.1cm, minimum height=0.5cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{decision} = [diamond, minimum width=1.5cm, minimum height=0.65cm, text centered, draw=black, fill=gray!10]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\node (start) [startstop] {\parbox{2.7cm}{Задание исходного уравнения $y_i$ где $i$ -- номер итерации}};
+\node (in1) [io, below of=start, yshift=-3.00] {\parbox{2.5cm}{Добавление к $y_i$ одночлена вида $kx_j$ где $k$ -- коэффициент \\ $j$ -- номер одночлена}};
+\node (pro1) [process, below of=in1, yshift=-12.0] {\parbox{3.4cm}{Оптимизация коэффициентов $y_i + kx_j$ с использованием процедуры на основе алгоритма Левенберга-Марквардта \\ Проверка соответствия критерию оценки эффективности идентификации $R^2$}};
+\node (dec1) [decision, below of=pro1, yshift=-0.35cm, minimum width=1.8cm] {};% {\footnotesize\bf \parbox{1.5cm}{Соответствие \\ критериям}};
+\node (dec2) [decision, below of=dec1, yshift=-0.05cm, minimum width=1.8cm] {};
+\node (out2a) [process, right of=dec2, xshift=1.9cm, minimum width=1.0cm, fill=yellow!40] {\parbox{2.2cm}{Задание $y_i + kx_j$ исходным уравнением \\ $i = i + 1$ \\ $j = j + 1$}};
+\node (out2b) [process, left of=dec1, xshift=-1.3cm, minimum width=1.0cm, fill=red!40] {\parbox{1.7cm}{Исключение $y_i + kx_j$ \\ $j = j + 1$}};
+\node (out2c) [startstop, below of=dec2, xshift=-2.5cm, yshift=0.2cm, minimum height=0.5cm, fill=green!40] {\parbox{2.0cm}{Окончательное $y_i + kx_j$}};
+% \node (stop) [startstop, below of=dec1, yshift=-1.1cm, fill=green!40, yshift=-0.1cm] {\small Окончательное $y_i + kx_j$};
+
+\draw [arrow] (start) -- (in1);
+\draw [arrow] (in1) -- (pro1);
+\draw [arrow] (pro1) -- (dec1);
+\draw [arrow] (dec2) -- node[anchor=south] {нет} (out2a);
+\draw [arrow] (dec1) -- node[anchor=south] {~~~~~~нет} (out2b);
+\draw [arrow] (dec1) -- node[anchor=west] {~~да} (dec2);
+\draw [arrow] (dec2) -- node[anchor=west] {~~да} (out2c);
+\draw [arrow] (out2a) |- ($(in1.east)+(0,-0.1)$);
+\draw [arrow] (out2b) |- ($(in1.west)+(0.05,0.1)$);
+%\draw [arrow] (out2b) ($(out2b.east)$)|- + (2.5,0) |- ($(in1.east)+(0.05,0.1)$); 
+\draw (2.5, -3.50) node {$R^2_{ij} > R^2_i$}; %  \\ $\delta(PS) \geq 85\%$
+\draw (2.5, -4.35) node {$R^2_{ij} \geq 0,9980$}; %  \\ $\delta(PS) \geq 85\%$
+\end{tikzpicture}
+
+\vskip152pt
+
+Следующий этап идентификации -- добавление членов $Q^2$ и $Q^3$, что позволило увеличить $R^2$ до 0,9700 и моделировать $S$-образный изгиб РНХ -- рисунок 2:
+
+\vskip-5pt
+\begin{equation}
+	\setcounter{equation}{2}
+	L\frac{dQ}{dt} = aQ + b\omega^2 + cQ^2 + dQ^3 - H,
+\end{equation}
+
+\vskip-4pt
+где $a-d$ -- коэффициенты, представленные функцией вида $x(\mu) = x_1\mu + x_2$.
+
+В результате математическая модель идентификации описывается уравнением:
+
+\vskip-2pt
+% \begin{equation*}
+% 	L\frac{dQ}{dt} = aQ + b\omega^2 +~ \tikzmarkin[set fill color=blue!10,set border color=blue!70]{b}(0.095,-0.2)(-0.095,0.4) cQ^2 + dQ^3 \tikzmarkend{b} ~+~ \tikzmarkin[set fill color=red!10,set border color=red!70]{c}(0.095,-0.2)(-0.095,0.4) eQ\omega^2 + fQ^2\omega\tikzmarkend{c} ~+ g - H,
+% \end{equation*}
+\vskip-3pt
+\begin{equation}
+	\setcounter{equation}{3}
+	L\frac{dQ}{dt} = aQ + b\omega^2 + cQ^2 + dQ^3 + eQ\omega^2 + fQ^2\omega + g - H.
+\end{equation}
+
+% \vskip-4pt
+% где $L$ -- параметр, характеризующий инерцию жидкости в насосе, $Q$ -- расход насоса, $\omega$ -- скорость вращения ротора насоса (об/мин), $H$ -- перепад давления в насосе, $\mu$ -- параметр, характеризующий вязкость жидкости, $a-g$ -- коэффициенты уравнения, представленные функцией вида $x = x_1\mu + x2$.
+
+% \vskip-4pt
+% \begin{itemize}
+%  \item члены вида ${\color{blue}Q^2}$ и ${\color{blue}Q^3}$ позволяют воспроизвести $S$-образную форму РНХ,% характерной для 
+% \end{itemize}
+% \vskip-8pt
+% \begin{itemize}
+%  \item члены вида ${\color{red}Q\omega^2}$ и ${\color{red}Q^2 \omega}$ позволяют воспроизвести влияние вязкости жидкости на наклон РНХ. % 
+% \end{itemize}
+
+% \vskip-2pt
+% \begin{itemize}
+%  \item члены вида ${\color{blue}Q^2}$ и ${\color{blue}Q^3}$ позволяют воспроизвести $S$-образную форму расходно-напорной кривой,% характерной для 
+%  \item члены вида ${\color{red}Q\omega^2}$ и ${\color{red}Q^2 \omega}$ позволяют воспроизвести влияние вязкости жидкости на наклон РНХ, \vskip-5pt % 
+%  %\item коэффициенты $a-g$ представлены линейной функцией вида $y(\mu) = k\mu + x$ где $\mu$ -- вязкость (сП),
+%  %\item $g$ -- поправочный коэффициент.
+%  \item значения коэффициентов уравнения рассчитаны с помощью разработанной процедуры оптимизации на основе алгоритма Левенберга-Марквардта.
+% \end{itemize}
+
+
+\end{minipage}
+
+\end{frame}
+
+% ------------------------------------------------------------------------------
+
+\begin{frame}{Режимы работы имплантируемого РНК}
+
+\footnotesize %\vskip-25pt
+Режимы работы РНК -- состояния в сердечно-сосудистой системе, обусловленные спецификой работы РНК \footnotemark[1].% \footfullcite{Karantonis_2006}:
+
+Предотвращение нежелательных режимов работы насоса является одной из основных задач при управлении РНК \footnotemark[2]$^-$\footnotemark[4], для эффективного решения которой необходима точная идентификация.
+%\end{minipage} 
+%\hfill
+%\begin{minipage}{0.26\textwidth}
+%\begin{figure}
+%	\includegraphics[width=0.75\textwidth]{heart_ps}
+%	\caption*{\scriptsize }
+%\end{figure}
+%\end{minipage}
+
+%\vfill
+
+\vskip10pt
+\begin{minipage}[bht]{0.20\textwidth}
+\begin{figure}
+	\includegraphics[width=0.85\textwidth]{../images/heart_ps_pres}
+	\caption*{\scriptsize Режим обратного течения через насос $\bf P_{BF}$}
+\end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[bht]{0.22\textwidth}
+\begin{figure}
+	\vskip5pt
+	\includegraphics[width=0.85\textwidth]{../images/heart_ps_pres}
+	\caption*{\scriptsize Режим частичной разгрузки левого желудочка сердца \\ $\bf P_{PA}$}
+\end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[bht]{0.24\textwidth}
+\begin{figure}
+	\includegraphics[width=0.85\textwidth]{../images/heart_ps_pres}
+	\caption*{\scriptsize Режим полной разгрузки левого желудочка сердца $\bf P_{FA}$}
+\end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}[bht]{0.26\textwidth}
+\begin{figure}
+	\includegraphics[width=0.85\textwidth]{../images/heart_ps_pres}
+	\caption*{\scriptsize Режим коллапса левого желудочка сердца $\bf P_{VC}$}
+\end{figure}
+\end{minipage}
+
+\footnotetext[1]{\tiny ~\textit{Karantonis D. M., Lovell N. H., Ayre P. J. et al.} Identification and Classification of Physiologically Significant Pumping States in an Implantable Rotary Blood Pump \textcolor{pGray}{// Artificial Organs. 2006. Vol. 30, no. 9. P. 671-679.} }
+
+\footnotetext[2]{\tiny ~\textit{Petukhov D. S., Telyshev D. V., Selishchev S. V.} Control method of a rotary blood pump for a left ventricular assist device \textcolor{pGray}{// Sovremennye tehnologii v medicine 2016. Vol. 8, no. 1. P. 28-33.}}
+
+\footnotetext[3]{\tiny ~\textit{Petukhov D. S., Telyshev D. V.} Control strategy for an implantable rotary blood pump based on identification of pumping states \textcolor{pGray}{// 61st ASAIO Annual Conference. 2015. P. 4.}}
+
+\footnotetext[4]{\tiny ~\textit{Petukhov D. S., Telyshev D. V.} Design concept of patient-adaptive control method for a ventricular assist device \textcolor{pGray}{// 37th Annual International Conference of the IEEE Engineering in Medicine and Biology Society. 2015. P. 116.}}
+
+\begin{tikzpicture}[overlay]
+    \draw (1.80, 1.80) node {$Q_{Pump}$};
+	\path[-stealth, color=red, line width=1.0] (1.40,1.80) edge [bend left=40] (0.15,2.7);
+	\path[-stealth, color=blue, line width=1.0] (0.70,2.25) edge [bend right=25] (1.55,2.10);
+
+    %\draw (3, -1.95) node {$Q_{Pump}$};
+    %\draw (1.75, 0.15) node {$Q_{AV}$};
+	%\path[-stealth, color=red, line width=1.0] (3.8,-2.0) edge [bend left=50] (0.8,-0.7);
+	\path[-stealth, color=red, line width=1.1] (3.85,2.75) edge [bend left=15] (3.4,3.2);
+	%\path[-stealth, color=red, line width=1.0] (9.8,1.75) edge [bend left=40] (8.45,2.7);
+
+    %\draw (3, -1.95) node {$Q_{Pump}$};
+    \draw (4.35,3.0) node {$Q_{AV}$};
+	%\path[-stealth, color=red, line width=1.0] (3.8,-2.0) edge [bend left=50] (0.8,-0.7);
+	\path[-, color=red, line width=1.1] (6.5,2.75) edge [bend left=0] (6.1,3.2);
+	\path[-, color=red, line width=1.1] (6.5,3.18) edge [bend left=0] (6.1,2.75);
+
+    %\draw (3, -1.95) node {$Q_{Pump}$};
+    %\draw (5.3, 4.6) node {$P_{LV} \leq 0$};
+	%\path[-stealth, color=red, line width=1.0] (5.2,4.4) edge [bend left=20] (4.5,2.85);
+
+    \draw (10.9, 4.2) node {$P_{LV} \leq 0$};
+	\path[-stealth, color=violet, line width=1.0] (10.7,4.0) edge [bend left=20] (9.7,2.6);
+\end{tikzpicture}
+
+\end{frame}
+
+% ------------------------------------------------------------------------------
+
+\begin{frame}{Разработка математической модели сердечно-сосудистой системы}	
+
+\begin{minipage}[ht]{0.46\textwidth}
+\scriptsize
+
+
+\begin{figure}
+\center{\includegraphics[width=0.99\linewidth]{../images/cvs_model}}
+\vskip-1pt
+\caption{\scriptsize Сердечно-сосудистая система представленная в виде электрически-\\эквивалентной схемы; \tiny РНК -- роторный насос крови}
+\end{figure}
+
+\vskip-18pt
+\begin{equation*}
+	\Delta P_R = RQ,\quad \Delta P_L = L\frac{dQ}{dt},\quad \Delta P_C = \frac{V-V_0}{C},
+\end{equation*}
+\vskip-2pt
+
+где $P$ -- давление, $Q$ -- поток, $R$ -- сопротивление, \\$L$ -- индуктивность, $V$ -- объем, $C$ -- емкость \footnotemark[1].
+
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.51\textwidth}
+\scriptsize
+
+\vskip5pt
+\begin{figure}
+\center{\includegraphics[width=1.0\linewidth]{../images/cvs_hemodynamics_pres}}
+\caption{\scriptsize Гемодинамика в сердечной-\\сосудистой системе в условиях сердечной недостаточности; \tiny $P_{LV}$ -- давление в левом желудочке сердца, $P_{RV}$ -- давление в правом желудочке сердца, $P_{Ao}$ -- давление в аорте, $P_{PA}$ -- давление в легочной артерии, $P_{CV}$ -- центральное венозное давление, $P_{PCW}$ -- давление заклинивания в легочных капиллярах, $Q_{AV}$ и $Q_{MV}$ -- потоки через аортальный и митральный клапаны, $V_{LV}$ и $V_{RV}$ -- объемы левого и правого желудочков сердца}
+\end{figure}
+
+\end{minipage}
+\vskip-2pt
+\scriptsize Данные о гемодинамике в условиях сердечной недостаточности взяты из литературы \footnotemark[1]. Коэффициенты математической модели определены с помощью разработанной процедуры оптимизации на основе алгоритма Левенберга-Марквардта \footnotemark[2]. 
+
+\vskip6pt
+\footnotetext[1]{\tiny ~\textit{Cox L. G., Loerakker S., Rutten M. C. et al.} A Mathematical Model to Evaluate Control Strategies for Mechanical Circulatory Support \textcolor{pGray}{// Artificial Organs. 2009. Vol. 33, no. 8. P. 593-603.} }
+
+\footnotetext[2]{\tiny ~\textit{Petukhov D. S., Telyshev D. V.} A mathematical model of the cardiovascular system of pediatric patients with congenital heart defect \textcolor{pGray}{// Biomedical Engineering. 2016. Vol. 50, no. 4. P. 229-232.} }
+
+% \vskip6pt
+% \footnotetext[3]{\tiny ~\textit{Петухов Д. С., Телышев Д. В.} Математическая модель сердечно-сосудистой системы педиатрических пациентов с врожденными пороками сердца \textcolor{pGray}{// Медицинская техника. 2016. № 4. С. 9--11.} }
+
+% \footnotetext[2]{\scriptsize ~\textit{Martina J. R., Bovendeerd P. H., de Jonge N. et al.} Simulation of Changes in Myocardial Tissue Properties During Left Ventricular Assistance With a Rotary Blood Pump \textcolor{pGray}{// Artificial Organs. 2013. Vol. 37, no. 6. P. 531-540.} }
+
+\end{frame}
+
+% ------------------------------------------------------------------------------
+
+\begin{frame}{Моделирование взаимодействия РНК и сердечно-сосудистой системы}
+
+\begin{minipage}[ht]{0.34\textwidth}
+\scriptsize
+
+\begin{figure}
+\center{\includegraphics[width=1.0\linewidth]{../images/ps_range_upd}}
+\caption{\scriptsize Режимы работы насоса, определенные из гемодинамических зависимостей на модели сердечно-сосудистой системы; \\ \tiny $Q_{P[min]}$ -- минимальный расход насоса (л/с), $Q_{AV}$ -- поток через аортальный клапан (л/мин), $P_{PCW}$ -- давление заклинивания в легочных капиллярах (мм рт. ст.)}
+\end{figure}
+
+%\vskip-5pt
+Определены режимы работы насоса -- обратное течение через насос, частичная и полная разгрузка желудочка и коллапс желудочка сердца. % \footnotemark[1].%$^, $\footnotemark[3]. 
+
+% \begin{figure}
+% \center{\includegraphics[width=1.0\linewidth]{final_model_hq_curves}}
+% \caption{\scriptsize Расходно-напорные характеристики насоса \tiny{(сверху)} \scriptsize и соответствующие контуры давление-объем левого желудочка сердца \tiny{(снизу)} \scriptsize при различных скоростях насоса (об/мин) и величинах параметра $\mu$ (сП)}
+% \end{figure}
+% 
+% \vskip-1pt
+% \scriptsize %Показано влияние вязкости жидкости на форму РНХ насоса и на разгрузку желудочка сердца.
+% 
+% Нелинейная форма расходно-напорной характеристики согласуется с опубликованными результатами исследований роторных насосов крови \footnotemark[1]$^, $\footnotemark[2]. 
+
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.64\textwidth}
+\scriptsize
+
+\vskip6pt
+Предложены \underline{критерии оценки эффективности идентификации}:
+\vskip-3pt
+\begin{itemize}
+ \item точность оценки расхода насоса $\delta(Q) \geq 90\%$, \vskip-5pt
+ \item \vskip-3pt точность определения перехода между режимами работы насоса $\delta(PS) \geq 80\%$.
+\end{itemize}
+
+\vskip-3pt
+\tiny Точность оценки расхода насоса вычисляется по формуле:
+
+\vskip-4pt
+\begin{equation}
+	\delta(Q) = \left( 1 - (Q_M - Q_E)/Q_M \right) \cdot 100 \%,
+\end{equation}
+
+\vskip-3pt
+где $Q_M$ -- расход насоса, измеренный датчиком, $Q_E$ -- расход насоса, оцененный с помощью математической модели. 
+
+Точность определения перехода между режимами работы насоса вычисляется по формуле:
+
+\vskip-8pt
+\begin{equation}
+	\delta(PS) = \left(1 - \frac{\lvert \omega_t - \omega_m \rvert}{\omega_{max} - \omega_{min}} \right) \cdot 100\%,
+\end{equation}
+
+\vskip-2pt
+где $\omega_t$ -- скорость при переходе между режимами работы, определенная из гемодинамической зависимости, $\omega_m$ -- скорость при переходе между режимами работы, определенная с помощью производной, $\omega_{max}$ и $\omega_{min}$ -- верхняя и нижняя граница скорости насоса.
+
+\vskip3pt
+Разработан \emph{метод определения режимов работы насоса}, который заключается в анализе производных, найденных из математической модели идентификации, при различных скоростях насоса \footnotemark[1]. 
+
+
+% \tiny Точность оценки расхода насоса вычисляется по формуле:
+% 
+% \vskip-1pt
+% \begin{equation}
+% 	\delta(Q) = \left( 1 - (Q_M - Q_E)/Q_M \right) \cdot 100 \%,
+% \end{equation}
+% 
+% где $Q_M$ -- расход насоса, измеренный датчиком, $Q_E$ -- расход насоса, оцененный с помощью математической модели. 
+
+%Результаты расчета $\delta(PS)$ на математической модели сердечно-сосудистой системы в различных физиологических условиях представлены в таблице 1. 
+
+\vskip-11pt
+\tiny
+\setcounter{table}{0}
+\begin{table}
+\caption{\tiny Результаты расчета точности определения перехода между режимами работы насоса ($\delta(PS)$, \%) на математической модели сердечно-сосудистой системы в различных физиологических условиях при $\mu$ 3,6 сП}\vskip-5pt
+\begin{tabular}{lrrr}
+\toprule
+ & Сократимость & ЧСС & Среднее\\
+\midrule
+$\delta(P_{BF}/P_{PA})$				& 89,3		&	88,0		& 88,6\\
+$\delta(P_{PA}/P_{FA})$				& 98,0		& 98,0		& 98,0\\
+%$\delta(P_{FA}/P_{PVC})$				& 92,0		& 89,3		& 90,6\\
+$\delta(P_{FA}/P_{VC})$			& 84,0		& 81,3		& 82,6\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{minipage}
+
+\vskip2pt
+
+\footnotetext[1]{\tiny ~\textit{Petukhov D. S., Telyshev D. V.} Simulation of blood flow dynamics changes through implantable axial flow pump \textcolor{pGray}{// Biomedical Engineering. 2015. Vol. 48, no. 6. P. 336-340.} }
+
+\end{frame}
+
+% ------------------------------------------------------------------------------
+
+\begin{frame}{Экспериментальное исследование Спутник}
+
+\scriptsize
+\begin{minipage}[ht]{0.49\textwidth}
+
+Имплантируемые роторные насосы крови Спутник:
+
+$\cdot$ Спутник 1~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$\cdot$ Спутник 2
+
+\includegraphics[scale=0.06]{../images/c1_s1_new}~~~~~~~~~~~~\includegraphics[scale=0.06]{../images/c1_s2_new}
+
+\vskip5pt
+Испытательный гидродинамический стенд \tiny (Институт Гельмгольца по биомедициской инженерии, г. Ахен, Германия) \vskip2pt
+
+{~~~~~~~~~~~~~~~~\centering\includegraphics[scale=0.65]{../images/mcl_scheme}}
+
+\vskip5pt
+\tiny Частота сердечных сокращений 80 уд/мин, вязкость жидкости в контуре 2,5 сП. Воспроизведены два состояния сердечно-сосудистой системы, соответствующие различным степеням сердечной недостаточности (contractilityFactor, cF): cF 0.5 и cF 0.25 \\ \vskip5pt
+
+\vskip-5pt
+{~~~~~~~~~~~~~~~~~~\centering\includegraphics[scale=0.35]{images/ml_cF}}
+
+% \begin{itemize}
+% 	\item Спутник 1
+% 	\begin{itemize} \tiny
+%  	\item применяется в первом отечественном \\АВК Спутник,
+%  	\item более 30 имплантаций,
+% 	\end{itemize}
+% 	\includegraphics[scale=0.08]{../images/c1_s1_new} \\ 
+% 	\item Спутник 2
+% 	\begin{itemize}\tiny
+% 		\item длина уменьшена с 81 мм до 70 мм, \\диаметр -- с 34 мм до 29 мм,
+% 		\item масса уменьшена с 246 г до 205 г,
+% 	 	\item энергопотребление уменьшено \\на 15\%,
+% 		\item испытания \textit{in vivo}.
+% 	\end{itemize}
+% 	\includegraphics[scale=0.08]{../images/c1_s2_new}
+% \end{itemize}
+
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.49\textwidth}
+\scriptsize
+
+\vskip3pt
+Результаты экспериментального исследования: 
+\vskip-14pt
+\begin{figure}
+  \center
+  \includegraphics[scale=0.35]{../images/hq_s1_present}
+  \vskip-8pt\caption{\tiny Расходно-напорные характеристики Спутник 1} 
+\end{figure}
+\vskip-20pt
+\begin{figure}
+  \center
+  \includegraphics[scale=0.35]{../images/hq_s2_present}
+  \vskip-8pt\caption{\tiny Расходно-напорные характеристики Спутник 2} 
+\end{figure}
+\vskip-20pt
+\begin{figure}
+\center{\includegraphics[width=0.515\linewidth]{../images/c5_ps_sputnik_1_pres}\includegraphics[width=0.515\linewidth]{../images/c5_ps_sputnik_2_pres}}
+\vskip-8pt\caption{\tiny Режимы работы насоса, определенные из экспериментальных гемодинамических зависимостей:\\ Спутник 1 (слева) и Спутник 2 (справа); \\ $Q_{P[min]}$ -- минимальный расход насоса (л/мин), $Q_{AV}$ -- поток через аортальный клапан (л), $P_{ED}$ -- конечно-диастолическое давление в желудочке сердца (мм рт. ст.)}
+\end{figure}
+
+\vskip-4pt
+\tiny \emph{Режим коллапса желудочка сердца} $P_{VC}$ определен как отрицательное конечно-диастолические давление в желудочке сердца.
+
+\end{minipage}
+
+% \only<1>{
+% Два поколения имплантируемого роторного насоса крови Спутник:
+% \vskip2pt
+% \begin{minipage}[ht]{0.52\textwidth}
+% \begin{itemize}%[<+- | alert@+>]
+%  \item Спутник 1
+%  \begin{itemize}
+%  	\footnotesize
+%  	\item применяется в первом отечественном АВК Спутник,
+%  	\item более 30 имплантаций,
+% %	\item добавить ссылки из литературных источников?
+%  \end{itemize}
+%  \vskip15pt
+%  \item Спутник 2
+%  \begin{itemize}
+%  	\footnotesize
+% 	\item длина уменьшена с 81 мм до 70 мм, диаметр -- с 34 мм до 29 мм,
+% 	\item масса уменьшена с 246 г до 205 г,
+%  	\item энергопотребление уменьшено \\на 15\%,
+% 	\item испытания \textit{in vivo}.
+%  \end{itemize}
+% \end{itemize}
+% 
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.47\textwidth}
+% \only<1>{
+% \center{\includegraphics[scale=0.10]{../images/c1_s1_new} } \\
+% \center{~\includegraphics[scale=0.10]{../images/c1_s2_new} } 
+% }
+% \end{minipage}
+% }
+% 
+% \only<2>{
+% \frametitle{Экспериментальное исследование: испытательный стенд}
+% %  кафедра Медицинских информационных технологий, Рейнско-Вестфальский технический университет Ахена
+% \begin{minipage}[ht]{0.52\textwidth}
+% Испытательный гидродинамический стенд (\small Институт Гельмгольца по биомедициской инженерии, г. Ахен, Германия\normalsize): 
+% 
+% \footnotesize
+% \begin{itemize}%[<+- | alert@+>]
+%  \item частота сокращений искусственного желудочка сердца 80 уд/мин,
+%  \item вязкость жидкости в контуре 2,5 сП,
+%  \item два состояния сердечно-сосудистой системы (contractilityFactor, cF): 
+%  \begin{itemize}[<2>]
+%  	\footnotesize
+%  	\item cF 0,5
+% 	\item cF 0,25
+%  \end{itemize}
+% \center{\includegraphics[scale=0.5]{images/ml_cF}}
+% \end{itemize}
+% 
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.46\textwidth}
+% \only<2>{\center{ \includegraphics[scale=0.5]{../images/mcl_scheme} \vskip0.5pt \includegraphics[scale=0.11]{images/IMG_7816} } }
+% \end{minipage}
+% % Вложенный список: ЧСС искусственного желудочка сердца 80 уд/мин, вязкость жидкости в контуре 2.5 сП, состояния сердечно-сосудистой системы cF 0.5 cF 0.25 | рядом фото 
+% }
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Результаты экспериментального исследования}
+% 
+% \begin{minipage}[ht]{0.49\textwidth}
+% 
+% \begin{figure}
+%   \center
+%   \includegraphics[scale=0.31]{images/pv_hq_05_025}
+%   \caption{\scriptsize Расходно-напорные характеристики насоса Спутник 1 (сверху) и соответствующие контуры давление-объем левого желудочка сердца (снизу) в состояниях cF 0,5 (слева) cF 0,25 (справа) в диапазоне скоростей от 5000 об/мин (\textcolor{blue}{\rule[0.8 mm]{3 mm}{.55pt}}) \\ до 9000 об/мин (\textcolor{blue}{\rule[0.6 mm]{3 mm}{1.2pt}})} 
+% \end{figure}
+% 
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.49\textwidth}
+% 
+% \begin{figure}
+%   \center
+%   \includegraphics[scale=0.31]{images/pv_hq_05_025_S2}
+%   \caption{\scriptsize Расходно-напорные характеристики насоса Спутник 2 (сверху) и соответствующие контуры давление-объем левого желудочка сердца (снизу) в состояниях cF 0,5 (слева) cF 0,25 (справа) в диапазоне скоростей от 5000 об/мин (\textcolor{blue}{\rule[0.8 mm]{3 mm}{.55pt}}) \\ до 9000 об/мин (\textcolor{blue}{\rule[0.6 mm]{3 mm}{1.2pt}})} 
+% \end{figure}
+% 
+% \end{minipage}
+% 
+% \vskip-10pt
+% \tiny
+% \underline{Критерии оценки эффективности идентификации}:
+%  \begin{itemize} 
+%   \item \vskip-3pt точность оценки расхода насоса,
+%   \item точность определения переходов между режимами работы насоса.
+%  \end{itemize}
+% 
+% \vskip-4pt
+% Нелинейная форма расходно-напорной характеристики насоса согласуется с результатами моделирования \footnotemark[1]$^, $\footnotemark[2] и литературными данными \footnotemark[3]. 
+% 
+% \vskip6pt
+% \footnotetext[1]{\tiny ~\textit{Петухов Д. С.} Моделирование и управление расходно-напорными характеристиками имплантируемого насоса крови АВК-Н <<Спутник>> \textcolor{pGray}{// Медицинская техника. 2016. № 6. С. 52--55.} }
+% \footnotetext[2]{\tiny ~\textit{Petukhov D. S., Telyshev D. V., Selishchev S. V.} A method for identification of pumping states in an implantable rotary blood pump: experimental validation for the LVAD Sputnik \textcolor{pGray}{// 62nd ASAIO Annual Conference. 2016. P. 10.} }
+% \footnotetext[3]{\tiny ~\textit{Stanfield J. R., Selzman C. H.} In Vitro Pulsatility Analysis of Axial-Flow and Centrifugal-Flow Left Ventricular Assist Devices \textcolor{pGray}{// Journal of Biomechanical Engineering. 2013. Vol. 135, no. 3. P. 1-6.} }
+% 
+% \end{frame}
+
+% ------------------------------------------------------------------------------
+
+
+% ------------------------------------------------------------------------------
+
+% \begin{frame}{Основные понятия}
+% \small
+% 
+% \only<1>{
+% \begin{enumerate}
+% % \item РНК -- роторный насос крови,
+%  \item РНХ -- расходно-напорные характеристики, описывающие производительность насоса.
+% \end{enumerate}
+% \vskip-5pt
+%  \begin{itemize}
+%   \item статические РНХ
+%   %\vskip80pt
+% %  \item динамические РНХ
+%  \end{itemize}
+% \begin{minipage}[ht]{0.48\textwidth}
+% \begin{figure}
+% \center{\includegraphics[width=0.60\linewidth]{hq_static_exp}}
+% \caption*{\footnotesize Пример испытательного стенда}
+% \end{figure}
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.48\textwidth}%
+% \begin{figure}
+% \center{\includegraphics[width=0.80\linewidth]{hq_static}}
+% \caption*{\footnotesize РНХ, полученные в статических условиях}
+% \end{figure}
+% \end{minipage}
+% 
+% \begin{tikzpicture}[overlay]
+% %	\path[->, draw=blue, line width=1.0, fill=red,-triangle 45,postaction={draw, line width=3mm, shorten >=4mm, -}] (3.8,-1.0) edge [bend left=00] (5.9,-1.0);
+% %\draw[line width=5mm,fill=red] (3,6) -- (5,6);
+% %\draw[double arrow=1pt colored by mLightBlue!50!black and white,rounded corners] (3.8,-1.5) -- (5.9,-1.5);
+% %\draw[double arrow=1pt colored by mLightBlue!50!black and white,rounded corners] (4.0,2.5) -- (5.9,2.5);
+% \path[-stealth, color=mLightBlue, line width=1.0] (4.2,-1.3) edge [bend left=0] (6.05,-1.3);
+% \path[-stealth, color=mLightBlue, line width=1.0] (4.3,2.5) edge [bend left=0] (6.05,2.5);
+% 
+% \end{tikzpicture}
+% 
+% %\newcommand{\mycirc}[1]{\tikz{\path[draw=black,fill=#1,line width=0.25] (0,0) circle [radius=0.09];}} % --(0.525,0.25)--(0,0.5)--cycle;}}
+% \vskip-20pt
+% 
+%  \begin{itemize}
+% %  \item статические РНХ
+%   %\vskip80pt
+%   \item динамические РНХ
+%  \end{itemize}
+% \begin{minipage}[ht]{0.48\textwidth}
+% \begin{figure}
+% \center{\includegraphics[width=0.75\linewidth]{hq_dynamic_exp}}
+% \caption*{\footnotesize Пример испытательного стенда с искуственным желудочком сердца}
+% \end{figure}
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.48\textwidth}%
+% \begin{figure}
+% \center{\includegraphics[width=0.80\linewidth]{hq_dynamic}}
+% \caption*{\footnotesize РНХ, полученные в динамических условиях}
+% \end{figure}
+% \end{minipage}
+% 
+% % \begin{enumerate}
+% %  \item РНК -- роторный насос крови,
+% %  \begin{itemize}
+% %   \item статические РНХ
+% %  \end{itemize}
+% % \end{enumerate}
+% 
+% % \begin{minipage}[ht]{0.3\textwidth}
+% % \begin{itemize}
+% %  \item \alert<1>{статические РНХ}
+% % % \item \alert<2>{динамические РНХ}
+% % \end{itemize}
+% % \end{minipage}
+% % \hfill
+% % \begin{minipage}[ht]{0.68\textwidth}
+% % %	\only<1>{\center{\includegraphics[scale=0.6]{images/hq_static} \vskip4pt ~\includegraphics[scale=1.95]{hq_static_exp} } }
+% % %	\only<2>{\center{\includegraphics[scale=0.6]{images/hq_dynamic} \vskip4pt ~\includegraphics[scale=1.95]{hq_dynamic_exp} } }
+% % \end{minipage}
+% }
+% 
+% \only<2>{
+% \begin{enumerate}\addtocounter{enumi}{1}
+%  \item Циклические зависимости давления от объема желудочка сердца, описывающие производительность желудочка.
+% \end{enumerate}
+% 
+% \begin{figure}
+% \center{\includegraphics[width=0.99\linewidth]{pv_loops}}
+% \caption{\footnotesize Временные диаграммы давления и объема (слева) и соответствующие циклические зависимости давления от объема (справа) для двух вариантов левого желудочка сердца: здорового (\textcolor{pGreen}{\rule[0.75 mm]{3 mm}{0.8pt}}) и больного (\textcolor{red}{\rule[0.75 mm]{3 mm}{0.8pt}})}
+% \end{figure}
+% 
+% }
+% \end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% 
+% \begin{frame}{Разработка математической модели насоса}
+% 
+% %\setcounter{figure}{0}
+% \small
+% Общее уравнение для описания расходно-напорной характеристики насоса \footnotemark[1]:% \footfullcite{Stepan1957}:
+% \vskip-9pt
+% \begin{equation}
+% 	H = \frac{u}{g}\left( u - \frac{Q}{A}\cot\beta \right), %\longrightarrow aQ + b\omega^2 + H = 0,
+% 	\label{eq:pump_model_dev_s1}
+% \end{equation}
+% 
+% где $H$ -- напор, $u$ -- окружная скорость рабочего колеса насоса, $g$ -- ускорение свободного падения, $Q$ -- подача насоса, $A$ -- площадь выходного отверстия насоса, \\ $\beta$ -- угол лопатки рабочего колеса на выходе.
+% 
+% Уравнение \ref{eq:pump_model_dev_s1} можно переписать в следующем виде:
+% \vskip-9pt
+% \begin{equation}
+% 	aQ + b\omega^2 + H = 0,
+% 	\label{eq:pump_model_dev_s2}
+% \end{equation}
+% 
+% где $Q$ -- расход насоса, $\omega$ -- скорость вращения ротора насоса, $H$ -- перепад давления в насосе, $a$ и $b$ -- коэффициенты.
+% 
+% Преобразование \ref{eq:pump_model_dev_s2} с целью описания работы РНК в динамических условиях \footnotemark[2]:% \footfullcite{Moscato_2009}: 
+% \vskip-9pt
+% \begin{equation}
+% 	L\frac{dQ}{dt} = aQ + b\omega^2 + H,
+% \end{equation}
+% 
+% где $L$ -- параметр, характеризующий влияние инерции жидкости в насосе.
+% 
+% \end{frame}
+
+%итоговая модель (что и как описывает) ; структура + РНХ
+% \begin{frame}{Разработка алгоритма идентификации имплантируемого РНК}
+% \scriptsize
+% 
+% \begin{minipage}[ht]{0.60\textwidth}
+% 
+% \vskip1pt
+% \begin{equation}
+% 	L\frac{dQ}{dt} = aQ + b\omega^2 + H,
+% \end{equation}
+% 
+% \vskip1pt
+% \scriptsize где $L$ -- параметр, характеризующий влияние инерции жидкости в насосе, $Q$ -- расход насоса, $\omega$ -- скорость вращения ротора насоса, $H$ -- перепад давления в насосе, $a$ и $b$ -- коэффициенты.
+% %\footnotesize
+% 
+% \vskip1pt
+% Уравнение 1 \emph{не позволяет описать} требуемые характеристики насоса!
+% 
+% \vskip7pt
+% Математическая модель роторного насоса крови представлена следующим уравнением:
+% 
+% \vskip-3pt
+% \begin{equation}
+% 	L\frac{dQ}{dt} = aQ + b\omega^2 +~ \tikzmarkin[set fill color=blue!10,set border color=blue!70]{b}(0.095,-0.2)(-0.095,0.4) cQ^2 + dQ^3 \tikzmarkend{b} ~+~ \tikzmarkin[set fill color=red!10,set border color=red!70]{c}(0.095,-0.2)(-0.095,0.4) eQ\omega^2 + fQ^2\omega\tikzmarkend{c} ~+ g - H
+% %	\label{eq:final_rbp_model}
+% \end{equation}
+% 
+% \vskip-2pt
+% \begin{itemize}
+%  \item члены вида ${\color{blue}Q^2}$ и ${\color{blue}Q^3}$ позволяют воспроизвести $S$-образную форму статической расходно-напорной кривой,% характерной для 
+% % \item члены вида ${\color{blue}Q^2}$ и ${\color{blue}Q^3}$ позволяют воспроизвести $S$-образную форму статической расходно-напорной кривой,% характерной для всех роторных насосов осевого типа,
+%  \item члены вида ${\color{red}Q\omega^2}$ и ${\color{red}Q^2 \omega}$ позволяют воспроизвести влияние вязкости жидкости на наклон РНХ, % 
+%  \item коэффициенты $a-g$ представлены линейной функцией вида $y(\mu) = k\mu + x$ где $\mu$ -- вязкость (сП),
+%  %\item $g$ -- поправочный коэффициент.
+%  \item значения коэффициентов уравнения рассчитаны с помощью разработанной процедуры оптимизации на основе алгоритма Левенберга-Марквардта.
+% \end{itemize}
+% 
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.35\textwidth}
+% 
+% \begin{figure}
+% \center{\includegraphics[width=0.9\linewidth]{static_model_lim}}
+% \caption{\scriptsize Статические расходно-напорные характеристики насоса, описываемые уравнением 1}
+% \end{figure}
+% 
+% \begin{figure}
+% \center{\includegraphics[width=0.99\linewidth]{static_model_full}}
+% \caption{\scriptsize Статические расходно-напорные характеристики насоса, описываемые уравнением 2}
+% \end{figure}
+% 
+% \end{minipage}
+% % \vfill
+% % \begin{minipage}[ht]{0.52\textwidth}
+% % 
+% % \end{minipage}
+% % \hfill
+% % \begin{minipage}[ht]{0.44\textwidth}
+% % 
+% % \end{minipage}
+% 
+% \end{frame}
+
+
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Гемодинамика в сердечно-сосудистой системе}
+% 
+% \begin{figure}
+% \center{\includegraphics[width=0.99\linewidth]{cvs_hemodynamics}}
+% \caption{Гемодинамика в сердечной-сосудистой системе в условиях сердечной недостаточности; \tiny $P_{LV}$ -- давление в левом желудочке сердца, $P_{RV}$ -- давление в правом желудочке сердца, $P_{Ao}$ -- давление в аорте, $P_{PA}$ -- давление в легочной артерии, $P_{CV}$ -- центральное венозное давление, $P_{PCW}$ -- давление заклинивания в легочных капиллярах, $Q_{AV}$ и $Q_{MV}$ -- потоки через аортальный и митральный клапаны, $V_{LV}$ и $V_{RV}$ -- объемы левого и правого желудочков сердца}
+% \end{figure}
+% 
+% \end{frame}
+
+
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Режимы работы РНК}
+% 
+% \only<1-5>{
+% Режимы работы насоса -- состояния в сердечно-сосудистой системе, обусловленные спецификой работы РНК \footnotemark[1]:% \footfullcite{Karantonis_2006}:
+% \vskip35pt
+% 
+% %c\footnotext{~\textit{Karantonis D. M., Lovell N. H., Ayre P. J. et al.} Identification and Classification of Physiologically Significant Pumping States in an Implantable Rotary Blood Pump \textcolor{pGray}{// Artificial Organs. 2006. Vol. 30, no. 9. P. 671-679.} }
+% 
+% 
+% %Список: обратное течение крови (как определяется на картинке), состояние аортального клапана (картинка с направлением потоков через сердце при наличии насоса), коллапс желудочка сердца (аналогичная картинка с отметками давлений и объемов)
+% 
+% \begin{minipage}[ht]{0.48\textwidth}
+% \begin{itemize}
+%  \item<1-> \alert<1>{обратное течение крови ($P_{BF}$),}
+%  \vskip5pt
+%  \item<1-> \alert<2-3>{частичная и полная разгрузка желудочка сердца ($P_{PA}$ и $P_{FA}$),}
+%  \vskip5pt
+%  \item<1-> \alert<4-5>{частичный и полный коллапс желудочка сердца ($P_{PVC}$ и $P_{FVC}$).}
+% \end{itemize}
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.48\textwidth}
+% 
+% \only<1>{
+% %\center{\includegraphics[scale=0.55]{bf_example} } 
+% \begin{tikzpicture}[overlay]
+%     \draw (2.5, 0) node[inner sep=0] (img) {\includegraphics[scale=0.4]{heart_ps}};
+%     \draw (4.5, 1) node {$\bf P_{BF}$};
+%     \draw (3, -1.95) node {$Q_{Pump}$};
+%     %\draw (1.75, 0.15) node {$Q_{AV}$};
+% 	\path[-stealth, color=red, line width=1.0] (3.8,-2.0) edge [bend left=50] (0.8,-0.7);
+% 	\path[-stealth, color=blue, line width=1.0] (2.0,-1.2) edge [bend right=28] (3.4,-1.45);
+% \end{tikzpicture}
+% }
+% 
+% \only<2>{
+% \begin{tikzpicture}[overlay]
+%     \draw (2.5, 0) node[inner sep=0] (img) {\includegraphics[scale=0.4]{heart_ps}};
+%     \draw (4.5, 1) node {$\bf P_{PA}$};
+%     \draw (3, -1.95) node {$Q_{Pump}$};
+%     \draw (1.75, 0.15) node {$Q_{AV}$};
+% 	\path[-stealth, color=red, line width=1.0] (3.8,-2.0) edge [bend left=50] (0.8,-0.7);
+% 	\path[-stealth, color=red, line width=1.1] (2.75,-0.35) edge [bend left=20] (1.90,0.7);
+% \end{tikzpicture}
+% }
+% %\center{\includegraphics[scale=0.2]{ps_basis_1} } }
+% 
+% \only<3>{
+% \begin{tikzpicture}[overlay]
+%     \draw (2.5, 0) node[inner sep=0] (img) {\includegraphics[scale=0.4]{heart_ps}};
+%     \draw (4.5, 1) node {$\bf P_{FA}$};
+%     \draw (3, -1.95) node {$Q_{Pump}$};
+%     \draw (1.75, 0.15) node {$Q_{AV}$};
+% 	\path[-stealth, color=red, line width=1.0] (3.8,-2.0) edge [bend left=50] (0.8,-0.7);
+% 	\path[-, color=red, line width=1.1] (2.50,-0.25) edge [bend left=0] (1.9,0.3);
+% 	\path[-, color=red, line width=1.1] (2.5,0.3) edge [bend left=0] (1.95,-0.25);
+% \end{tikzpicture}
+% }
+% 
+% \only<4>{
+% \begin{tikzpicture}[overlay]
+%     \draw (2.5, 0) node[inner sep=0] (img) {\includegraphics[scale=0.4]{heart_ps}};
+%     \draw (4.5, 1) node {$\bf P_{PVC}$};
+%     %\draw (3, -1.95) node {$Q_{Pump}$};
+%     \draw (4.35, 0.10) node {$P_{LV} \leq 0$};
+% 	%\path[->, color=blue, line width=0.75] (3.8,-2.0) edge [bend left=50] (0.8,-0.7);
+% 	\path[-stealth, color=red, line width=1.0] (3.75,0.1) edge [bend right=20] (2.92,-0.4);
+% 
+% %	\path[-stealth, color=red, line width=1.0] (1.20,2.7) edge [bend right=20] (1.60,1.70);
+% %	\path[-stealth, color=red, line width=1.0] (3.20,2.7) edge [bend left=20] (2.30,0.10);
+% 
+% %	\path[-stealth, color=red, line width=1.0] (4.2,1.5) edge [bend left=20] (3.30,-0.30);
+% %	\path[-stealth, color=mLightBlue, line width=1.0] (1.0,-1.70) edge [bend right=20] (2.15,-1.1);
+% \end{tikzpicture}
+% }
+% 
+% \only<5>{
+% \begin{tikzpicture}[overlay]
+%     \draw (2.5, 0) node[inner sep=0] (img) {\includegraphics[scale=0.4]{heart_ps}};
+%     \draw (4.5, 1) node {$\bf P_{FVC}$};
+%     %\draw (3, -1.95) node {$Q_{Pump}$};
+%     \draw (3.95, 1.95) node {$P_{Atrium} \leq 0$};
+% 	%\path[->, color=blue, line width=0.75] (3.8,-2.0) edge [bend left=50] (0.8,-0.7);
+% 	\path[-stealth, color=violet, line width=1.0] (3.65,1.74) edge [bend left=20] (2.60,0.4);
+% \end{tikzpicture}
+% }
+% \end{minipage}
+% \footnotetext[1]{~\textit{Karantonis D. M., Lovell N. H., Ayre P. J. et al.} Identification and Classification of Physiologically Significant Pumping States in an Implantable Rotary Blood Pump \textcolor{pGray}{// Artificial Organs. 2006. Vol. 30, no. 9. P. 671-679.} }
+% }
+% 
+% \end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Определение режимов работы РНК}
+% %изменение режимов работы с изменением скорости
+% \begin{figure}
+% \center{\includegraphics[width=0.94\linewidth]{ps_range}}
+% \caption{Режимы работы насоса, определенные из гемодинамических зависимостей на модели сердечно-сосудистой системы; \\ \footnotesize $Q_{P[min]}$ -- минимальный расход насоса (л/с), $Q_{AV}$ -- поток через аортальный клапан (л/мин), \\ $V_{LV}$ -- конечно-систолический объем левого желудочка сердца (мл), ДЗЛК -- давление заклинивания в легочных капиллярах (мм рт. ст.)}
+% \end{figure}
+% % добавить переходы цветом на каждой диаграмме
+% 
+% \end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% 
+% \begin{frame}{Метод определения режимов работы РНК}
+% \scriptsize
+% 
+% \begin{minipage}[ht]{0.44\textwidth}
+% 
+% \vskip5pt
+% \emph{Метод} заключается в анализе изменений в динамике течения жидкости через насос с помощью производных, найденных из математической модели РНК, которые коррелируют с гемодинамическими зависимостями, описывающими режимы работы насоса.
+% 
+% \vskip4pt
+% \emph{Режимы работы насоса:}
+% 
+% $\bf P_{BF}$ -- режим обратного течения через насос, \\ $\bf P_{PA}$ -- режим частичной разгрузки желудочка сердца, $\bf P_{FA}$ -- режим полной разгрузки желудочка сердца, $\bf P_{PVC}$ -- режим частичного коллапса желудочка сердца, $\bf P_{FVC}$ -- режим полного коллапса желудочка сердца.
+% 
+% %\begin{itemize}
+% % \item нахождение производных по зависимым переменным $Q$ и $\omega$ из математической модели роторного насоса крови с целью анализа изменений в динамике течения жидкости через насос,
+% 
+% % \begin{equation*}
+% % \begin{split}
+% % 	L\frac{dQ}{dt} = aQ + b\omega^2 + cQ^2 + dQ^3 + \ldots \\ \quad \ldots + eQ\omega^2 + fQ^2\omega + g - H
+% % \end{split}
+% % \end{equation*}
+% 
+% % \item анализ изменений в динамике течения жидкости через насос с помощью найденных производных,
+%  
+% %\item поиск корреляции между изменениями в динамике течения жидкости и гемодинамическими зависимостями, описывающими режимы работы насоса, и выбор производных, позволяющих определить режимы работы насоса.
+% 
+% % \item введение индексов производных для описания изменений в динамике производной за время сердечного цикла. 
+% %\end{itemize}
+% 
+% 
+% %Результаты расчета точности определения переходов между режимами работы представлены в таблице 1 и таблице 2.
+% \vskip-5pt
+% \begin{figure}
+% \center{\includegraphics[width=0.8\linewidth]{ps_id_ex}}
+% \caption{\scriptsize Пример определения режимов частичной и полной разгрузки левого желудочка сердца при изменении частоты сердечных сокращений (уд/мин);\\ \tiny $Q_{AV}$ -- поток через аортальный клапан, $S_{AV}$ -- индекс производной $dQ/dt~dQ/d\mu$}
+% \end{figure}
+% 
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.51\textwidth}
+% \scriptsize
+% 
+% \vskip-15pt
+% \begin{table}
+% \caption{\scriptsize Точность определения перехода между режимами работы насоса (\%) при $\mu$ 3,6 сП}\vskip-3pt
+% \begin{tabular}{lrrr}
+% \toprule
+%  & Сократимость & ЧСС & Среднее\\
+% \midrule
+% $P_{BF}/P_{PA}$				& 89,3		&	88,0		& 88,6\\
+% $P_{PA}/P_{FA}$				& 98,0		& 98,0		& 98,0\\
+% $P_{FA}/P_{PVC}$				& 92,0		& 89,3		& 90,6\\
+% $P_{PVC}/P_{FVC}$			& 84,0		& 81,3		& 82,6\\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+% 
+% \vskip-10pt
+% \begin{table}
+% \caption{\scriptsize Точность определения перехода между режимами работы насоса (\%) при вязкости 2,2 сП}\vskip-3pt
+% \begin{tabular}{lrrr}
+% \toprule
+%  & Сократимость & ЧСС & Среднее\\
+% \midrule
+% $P_{BF}/P_{PA}$				& 88,0		&	88,0		& 88,0\\
+% $P_{PA}/P_{FA}$				& 98,0		& 98,0		& 98,0\\
+% $P_{FA}/P_{PVC}$				& 96,0		& 93,3		& 94,7\\
+% $P_{PVC}/P_{FVC}$			& 84,0		& 82,7		& 83,4\\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+% 
+% \vskip2pt
+% Точность определения рассчитывается по следующей формуле:
+% \vskip-2pt
+% 
+% \begin{equation}
+% 	\left(1 - \frac{\omega_t - \omega_m}{\omega_{max} - \omega_{min}} \right) \cdot 100\%,
+% \end{equation}
+% 
+% \tiny где $\omega_t$ -- переход между режимами работы, определенный из гемодинамической зависимости, $\omega_m$ -- переход между режимами работы, определенный с помощью индекса производной, $\omega_{max}$ и $\omega_{min}$ -- верхняя и нижняя граница скорости насоса.
+% 
+% % \vskip-2pt
+% % \begin{figure}
+% % \center{\includegraphics[width=0.92\linewidth]{ps_id_ex}}
+% % \caption{\small Пример определения режимов частичной и полной разгрузки левого желудочка сердца; \footnotesize $Q_{AV}$ -- поток через аортальный клапан, $S_{AV}$ -- индекс производной $dQ/dt~dQ/d\mu$}
+% % \end{figure}
+% \end{minipage}
+% 
+% \end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Точность определения режимов работы РНК}
+% 
+% % \only<1>{
+% % \begin{figure}
+% % \center{\includegraphics[width=0.99\linewidth]{example_of_ps_identification}}
+% % \caption{Пример определения режима обратного течения крови ($P_{BF}$) при изменении сократимости левого желудочка, \% (слева) и режима полного коллапса желудочка ($P_{FVC}$) при изменении частоты сердечных сокращений, уд/мин (справа); $S_{BF}(d^2Q/dt^2~dQ/d\mu)$ и $S_{VC2}(dQ/dt)$ -- индексы производных} % добавить значения индексов
+% % \end{figure}
+% % }
+% % 
+% % \only<2>{
+% 
+% \begin{table}
+% \caption{Точность определения перехода между режимами работы насоса (\%)}
+% \begin{tabular}{lrrr}
+% \toprule
+%  & Сократимость & ЧСС & Среднее\\
+% \midrule
+% $P_{BF}/P_{PA}$				& 89,3		&	88,0		& 88,6\\
+% $P_{PA}/P_{FA}$				& 98,0		& 98,0		& 98,0\\
+% $P_{FA}/P_{PVC}$				& 92,0		& 89,3		& 90,6\\
+% $P_{PVC}/P_{FVC}$			& 84,0		& 81,3		& 82,6\\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+% 
+% \vskip5pt
+% \small Точность определения рассчитывается по следующей формуле:
+% \vskip-5pt
+% 
+% \begin{equation}
+% 	\left(1 - \frac{\omega_t - \omega_m}{\omega_{max} - \omega_{min}} \right) \cdot 100\%,
+% \end{equation}
+% 
+% \small где $\omega_t$ -- переход между режимами работы, определенный из гемодинамической зависимости, $\omega_m$ -- переход между режимами работы, определенный из динамики производной, $\omega_{max}$ и $\omega_{min}$ -- верхняя и нижняя граница скорости насоса.
+% 
+% \end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Основные требования к системе управления}
+% 
+% \begin{itemize}
+%  \item \alert<1>{оценка расхода роторного насоса крови на основе доступных параметров насоса,}
+%  \item \alert<3>{поддержание требуемого уровня расхода в различных физиологических условиях} либо \textcolor<2>{red}{обеспечение физиологического потока через насос, соответствующего потребностям организма \only<2>{\Large\bf ?\normalsize}},
+%  \item \alert<1>{предотвращение неблагоприятных состояний в сердечно-сосудистой системе, обусловленных спецификой работы роторного насоса.} 
+% \end{itemize}
+% 
+% \end{frame}
+% 
+% % ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% 
+% \begin{frame}{Алгоритм управления РНК}
+% \small
+% 
+% \begin{figure}
+% \center{\includegraphics[width=0.95\linewidth]{control_algorithm}}
+% \caption{Структурная схема алгоритма управления имплантируемым роторным насосом крови; \footnotesize $H$ -- перепад давления в насосе, $\omega$ -- скорость вращения ротора насоса, $\mu$ -- вязкость жидкости, $Q$ -- расход насоса} % добавить расшифровку символов?
+% \end{figure}
+% \vskip-5pt
+% 
+% \footnotesize
+% Основная цель  управления -- поддержание заданного уровня расхода насоса ($Q_D$) с использованием скорости вращения ротора насоса в качестве управляемой переменной.
+% 
+% \vskip-4pt
+% \begin{itemize}%[<+- | alert@+>]
+%  \item \emph{Оценочный блок} -- оценка расхода насоса и определение режима работы роторного насоса крови на основе математической модели роторного насоса крови: \scriptsize $Q_A$ -- расход насоса в течение заданного количества сердечных циклов, $Q_P$ -- минутный расход насоса, \footnotesize \vskip2pt
+%  \item \emph{Блок регулирования скорости} -- формирование нового значения скорости вращения ротора насоса $\omega(t+1)$ в зависимости от разности $Q_D$ и $Q_A$ и от режима работы роторного насоса крови: \scriptsize $\omega+$ -- увеличение скорости, $\omega-$ -- уменьшение скорости.
+% \end{itemize}
+% 
+% % \begin{tikzpicture}[overlay]
+% % %[show background grid] %% Use ff
+% % \path[-stealth, color=mLightBlue, line width=0.45]<1> (3.30,2.30) edge [bend left] (2.80,5.805);
+% % %\path[->, color=mLightBlue, line width=0.45]<2> (3.65,1.54) edge [bend right] (5.95,3.95);
+% % \path[-stealth, color=mLightBlue, line width=0.45]<2> (5.25,1.75) edge [bend right=20] (9.55,5.30);
+% % \end{tikzpicture}
+% 
+% \end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+%\section{Эксперимент}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Обработка данных экспериментального исследования Спутник}
+% 
+% \footnotesize
+% Заданы следующие пороговые величины для критериев оценки эффективности идентификации:
+% \vskip-5pt
+% \begin{itemize}
+%  \item средняя точность оценки расхода РНК не менее 90 \%,
+%  \item точность определения перехода между режимами работы РНК не менее 85 \%.
+% \end{itemize}
+% 
+% \vskip-2pt
+% \begin{minipage}[ht]{0.50\textwidth}
+% \vskip-10pt
+% \scriptsize Точность оценки расхода насоса вычисляется по формуле:
+% 
+% \vskip-1pt
+% \begin{equation}
+% 	\left( 1 - (Q_M - Q_E)/Q_M \right) \cdot 100 \%,
+% \end{equation}
+% 
+% где $Q_M$ -- расход насоса, измеренный датчиком, $Q_E$ -- расход насоса, оцененный с помощью математической модели. 
+% 
+% \vskip5pt
+% Точность определения перехода между режимами работы насоса вычисляется по формуле:
+% 
+% %\vskip-1pt
+% \begin{equation}
+% 	\left(1 - \frac{\omega_t - \omega_m}{\omega_{max} - \omega_{min}} \right) \cdot 100\%,
+% \end{equation}
+% 
+% где $\omega_t$ -- переход между режимами работы, определенный из гемодинамической зависимости, $\omega_m$ -- переход между режимами работы, определенный с помощью производной, $\omega_{max}$ и $\omega_{min}$ -- верхняя и нижняя граница скорости насоса.
+% 
+% \vskip0pt
+% В ходе анализа экспериментальных гемодинамических зависимостей введен режим коллапса желудочка сердца $P_{VC}$, связанный с отрицательным конечно-диастолическим давлением в желудочке сердца. 
+% 
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.46\textwidth}
+% %\vskip-5pt
+% \begin{figure}
+% \center{\includegraphics[width=0.825\linewidth]{ps_determ_pres}}
+% \caption{\footnotesize Режимы работы насоса, определенные из экспериментальных гемодинамических зависимостей; \scriptsize \\ $Q_{P[min]}$ -- минимальный расход насоса (л/мин), $Q_{AV}$ -- поток через аортальный клапан (л), \\ $P_{ED}$ -- конечно-диастолическое давление левого желудочка сердца (мм рт. ст.)}
+% \end{figure}
+% \end{minipage}
+% 
+% \vskip-3pt
+% \footnotetext[1]{\tiny ~\textit{Petukhov D. S.} Quantitative assessment of heart-pump interaction for an axial-flow rotary blood pump Sputnik: in vitro study \textcolor{pGray}{// 44th ESAO and 7th IFAO Congress. 2017. P. 454.} }
+% 
+% \end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Результаты проверки математических моделей РНК}
+% 
+% \small
+% Введены следующие критерии, по которым оценивается математическая модель роторного насоса крови:
+% \begin{itemize}
+%  \item средняя точность оценки расхода РНК не менее 90 \%,
+%  \item точность определения перехода между режимами работы РНК не менее 85 \%.
+% \end{itemize} \small
+% 
+% ~~~~~\rule[1 mm]{9.0 cm}{.4pt}
+% 
+% \vskip-8pt
+% \begin{equation}
+% 	L\frac{dQ}{dt} = aQ + b\omega^2 + cQ^2 + dQ^3 + eQ\omega^2 + fQ^2\omega + g - H
+% \end{equation}
+% 
+% \footnotesize
+% \begin{itemize}
+%  \item средняя точность оценки расхода для <<Спутник 2>> -- 82,5 \%,
+%  \item точность определения режима $P_{VC}$ не более 75 \% для обоих насосов.
+% \end{itemize} \small
+% 
+% ~~~~~\rule[1 mm]{9.0 cm}{.4pt}
+% 
+% \vskip-8pt
+% \begin{equation}
+% 	L\frac{dQ}{dt} = aQ + b\omega^2 + cH %\text{\large \textcolor{red}{?}}
+% \end{equation}
+% 
+% \footnotesize
+% \begin{itemize}
+%  \item средняя точность оценки расхода не более 85 \% для обоих насосов,
+%  \item точность определения перехода $P_{BF}/P_{PA}$ не более 70 \% для обоих насосов,
+%  \item точность определения перехода $P_{PA}/P_{FA}$ для <<Спутник 2>> менее 75 \%,
+%  \item точность определения перехода $P_{FA}/P_{VC}$ для <<Спутник 1>> не более 80 \%.
+% \end{itemize} \small
+% 
+% %}
+% % 
+% % \only<2>{
+% % \begin{equation}
+% % 	L\frac{dQ}{dt} = aQ + b\omega^2 + cH %\text{\large \textcolor{red}{?}}
+% % \end{equation}
+% % 
+% % \begin{itemize}
+% %  \item средняя точность оценки расхода не более 85 \% для обоих насосов,
+% %  \item точность определения режима $P_{BF}$ не более 70 \% для обоих насосов,
+% %  \item точность определения режимов $P_{PA}/P_{FA}$ для <<Спутник 2>> менее 75 \%,
+% %  \item точность определения режима $P_{VC}$ для <<Спутник 1>> не более 80 \%.
+% % \end{itemize}
+% % }
+% 
+% \end{frame}
+
+\begin{frame}{Проверка критериев оценки эффективности идентификации}
+
+\scriptsize
+Заданы следующие пороговые величины для критериев оценки эффективности идентификации:
+
+\begin{itemize}
+ \item \vskip-4pt средняя точность оценки расхода РНК $\delta(Q) \geq 90 \%$,
+ \item \vskip1pt точность определения перехода между режимами работы РНК $\delta(PS) \geq 80 \%$.
+\end{itemize} \small
+
+\begin{minipage}[ht]{0.48\textwidth}
+\vskip-14pt
+\tiny Точность оценки расхода насоса вычисляется по формуле:
+
+\vskip-3pt
+\begin{equation}
+	\delta(Q) = \left( 1 - (Q_M - Q_E)/Q_M \right) \cdot 100 \%,
+\end{equation}
+
+где $Q_M$ -- расход насоса, измеренный датчиком, $Q_E$ -- расход насоса, оцененный с помощью математической модели \footnotemark[1]. 
+
+Исследованы два уравнения: разработанная математическая модель идентификации насоса HeartMate II и исходное уравнение для алгоритма идентификации \footnotemark[2].
+
+Уравнение математической модели идентификации записывается в следующем виде:
+
+\vskip-9pt
+\begin{equation} \tag{3}
+	L\frac{dQ}{dt} = aQ + b\omega^2 + cQ^2 + dQ^3 + eQ\omega^2 + fQ^2\omega + g - H.
+\end{equation}
+\vskip-2pt
+
+Исходное уравнение для алгоритма идентификации записывается в следующем виде:
+
+\vskip-4pt
+\begin{equation} \tag{4}
+	L\frac{dQ}{dt} = aQ + b\omega^2 + cH. %\text{\large \textcolor{red}{?}}
+\end{equation}
+
+\vskip0pt
+Коэффициенты уравнений $L$, $a$ -- $g$ определены с помощью разработанной процедуры оптимизации на основе алгоритма дифференциальной эволюции. 
+
+Исследованные уравнения позволяют оценить расход насоса и определить переходы между режимами работы насоса с точностью, которая 
+\vskip-3pt
+\large \bf \textcolor{red!70}{не соответствует критериям!}
+\vskip-9pt
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.48\textwidth}
+
+\tiny Точность определения перехода между режимами работы насоса вычисляется по формуле:
+
+%\vskip-1pt
+\begin{equation} \tag{2}
+	\delta(PS) = \left(1 - \frac{\lvert \omega_t - \omega_m \rvert}{\omega_{max} - \omega_{min}} \right) \cdot 100\%,
+\end{equation}
+
+где $\omega_t$ -- скорость при переходе между режимами работы, определенная из гемодинамической зависимости, $\omega_m$ -- скорость при переходе между режимами работы, определенная с помощью производной, $\omega_{max}$ и $\omega_{min}$ -- верхняя и нижняя граница скорости насоса \footnotemark[1].
+
+\vskip-10pt
+\setcounter{table}{0}
+\begin{table}
+\caption{\scriptsize Точность оценки расхода насоса ($\delta(Q)$, \%) и точность определения перехода между режимами работы насоса ($\delta(PS)$, \%); \\ С1 -- Спутник 1, С2 -- Спутник 2}\vskip-3pt
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{Уравнение 1} & \multicolumn{2}{c}{Уравнение 2} \\
+\midrule
+    	& С1 & С2 & С1 & С2 \\
+		\midrule
+%		8600 & 99,9 & 95,1 & 98,1 & 95,1 \\
+%		\midrule
+		Среднее $\delta(Q)$ & 97,6 & \textcolor{red}{85,4} & \textcolor{red}{84,6}	&	\textcolor{red}{79,5} \\
+\midrule
+$\delta(P_{BF}/P_{PA})$		& 	91,7								&	95,8									&	$-$	& 91,7	\\
+$\delta(P_{PA}/P_{FA})$		& 95,8								&	91,7									&	$-$	& $-$ \\
+$\delta(P_{FA}/P_{VC})$		& 	\textcolor{red}{79,1}	& \textcolor{red}{70,8}		& $-$	& 91,7 \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+% \begin{table}
+% \caption{\scriptsize Точность определения перехода между режимами работы насоса ($\delta(PS)$, \%); \\ С1 -- Спутник 1, С2 -- Спутник 2}\vskip-3pt
+% \begin{tabular}{lrrrr}
+% \toprule
+%  & \multicolumn{2}{c}{Уравнение 1} & \multicolumn{2}{c}{Уравнение 2} \\
+% \midrule
+% 			&	С1 & С2 & С1 & С2 \\
+% \midrule
+% $\delta(P_{BF}/P_{PA})$		& 	91,7								&	95,8									&	$-$	& 91,7	\\
+% $\delta(P_{PA}/P_{FA})$		& 95,8								&	91,7									&	$-$	& $-$ \\
+% $\delta(P_{FA}/P_{VC})$		& 	\textcolor{red}{79,1}	& \textcolor{red}{70,8}		& $-$	& 91,7 \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+\end{minipage}
+
+\vskip-3pt
+
+\footnotetext[1]{\tiny ~\textit{Petukhov D. S., Telyshev D. V.} An approach to the evaluation and control of a rotary blood pump using in vitro experimental results for two generations of LVAD Sputnik \textcolor{pGray}{// 24th Congress of the International Society for Rotary Blood Pumps. 2016. P. 70.} }
+
+\footnotetext[2]{\tiny ~\textit{Petukhov D. S., Telyshev D. V., Selishchev S. V.} A method for identification of pumping states in an implantable rotary blood pump: experimental validation for the LVAD Sputnik \textcolor{pGray}{// 62nd ASAIO Annual Conference. 2016. P. 10.} }
+
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+%\begin{frame}[plain]{}
+ 
+%\end{frame}
+
+% \begin{frame}{Изменения в алгоритме идентификации имплантируемого РНК}
+% 
+% \begin{tikzpicture}[node distance=1.5cm]
+% \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=1cm, minimum height=0.8cm,text centered, draw=black, fill=gray!10]
+% \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=1cm, minimum height=0.8cm, text centered, draw=black, fill=gray!10]
+% \tikzstyle{process} = [rectangle, minimum width=1cm, minimum height=0.8cm, text centered, draw=black, fill=blue!30]
+% \tikzstyle{decision} = [diamond, minimum width=2.0cm, minimum height=1.1cm, text centered, draw=black, fill=gray!10]
+% \tikzstyle{arrow} = [thick,->,>=stealth]
+% 
+% \node (start) [startstop] {\footnotesize\bf \parbox{3.7cm}{Задание исходного выражения,\\ введение критериев}};
+% \node (in1) [io, below of=start, yshift=-0.40] {\footnotesize\bf \parbox{3.2cm}{\bf Прибавление к исходному выражению члена $k\omega^xH^yQ^z$}};
+% \node (pro1) [process, below of=in1, yshift=-11.0] {\footnotesize\bf \parbox{3.5cm}{Оптимизация полученного уравнения для cF 0,5;\\проверка на соответствие критериям для cF 0,5 и cF 0,25}};
+% \node (dec1) [decision, below of=pro1, yshift=-0.55cm] {};% {\footnotesize\bf \parbox{1.5cm}{Соответствие \\ критериям}};
+% \node (out2a) [process, right of=dec1, xshift=2.7cm, minimum width=1.0cm, fill=yellow!60] {\footnotesize\bf \parbox{2.9cm}{Задание \\ $LdQ/dt=\ldots + k\omega^xH^yQ^z$ исходным выражением}};
+% \node (out2b) [io, left of=dec1, xshift=-1.9cm, minimum width=1.0cm, fill=red!60] {\footnotesize \parbox{1.3cm}{\bf Исключение данного\\ уравнения}};
+% \node (stop) [startstop, below of=dec1, fill=green!60, yshift=-0.1cm] {\footnotesize \textbf{Окончательное уравнение}};
+% 
+% \draw [arrow] (start) -- (in1);
+% \draw [arrow] (in1) -- (pro1);
+% \draw [arrow] (pro1) -- (dec1);
+% \draw [arrow] (dec1) -- (out2a);
+% \draw [arrow] (dec1) -- (out2b);
+% \draw [arrow] (dec1) -- (stop);
+% \draw [arrow] (out2a) |- ($(in1.east)+(0,-0.1)$);
+% \draw [arrow] (out2b) |- (in1.west);%($(start.south)!0.16!(pro1.north)$);
+% % $(processing.south)-(0,0.5)$
+% \draw [arrow] (dec1) -- node[anchor=south] {\footnotesize\it частично} (out2a);
+% \draw [arrow] (dec1) -- node[anchor=north] {\footnotesize\it нет} (out2b);
+% \draw [arrow] (dec1) -- node[anchor=west] {\footnotesize\it да} (stop);
+% 
+% \draw [arrow,gray, dotted, thick, shorten >=1mm] ($(start.east)+(4,-0.1)$) -- node[anchor=south] {\footnotesize \parbox{3.5cm}{где $LdQ/dt=aQ+b\omega^2+cH$ задано исходным выражением}} ($(start.east)+(0,-0.1)$);
+% \draw [arrow,gray, dotted, thick, shorten >=1mm] ($(in1.east)+(4,+0.1)$) -- node[anchor=south] {\footnotesize \parbox{3.5cm}{где $k$ -- коэффициент, $x,y, z$ -- целые числа в диапазоне -2\ldots 4}} ($(in1.east)+(0,+0.1)$);
+% 
+% %\draw [arrow] (dec1) -- node[anchor=south] {\footnotesize\it частично} (out2a);
+% 
+% \end{tikzpicture}
+% 
+% \end{frame}
+
+% \begin{frame}{Математические модели РНК <<Спутник>>}
+% 
+% В результате применения алгоритма разработки математической модели РНК, получены модели, которые соответствуют введенным критериям.
+% 
+% Модель для РНК <<Спутник 1>>, описывается следующим уравнением: %(\ref{eq:sputnik_1_eq}) и <<Спутник 2>> (\ref{eq:sputnik_2_eq}):
+% 
+% \begin{equation}
+% 	\label{eq:sputnik_1_eq}
+% 	L_1\frac{dQ}{dt} = a_1Q + b_1\omega^2 + c_1H + d_1HQ + e_1\omega^{-1} H^2 Q
+% \end{equation}
+% 
+% Модель для РНК <<Спутник 2>>, описывается следующим уравнением:
+% 
+% \begin{equation}
+% 	\label{eq:sputnik_2_eq}
+% 	L_2\frac{dQ}{dt} = a_2Q + b_2\omega^2 + c_2H + d_2HQ^3 + e_2\omega^{-1}Q
+% \end{equation}
+% 
+% \end{frame}
+
+% \only<1>{
+% Исходное уравнение: 
+% 
+% \begin{equation}
+% 	L\frac{dQ}{dt} = aQ + bH + c\omega^2, \text{\large \textcolor{red}{?}}
+% \end{equation}
+% 
+% \begin{itemize}
+%  \item низкая точность оценки расхода (>15\%),
+%  \item невозможность определения режимов работы насоса.
+% \end{itemize}
+% }
+% 
+% \only<2>{
+% \begin{itemize}
+%  \item прибавление члена вида $\omega^xH^yQ^z$, где $x, y, z$ = -2\ldots 4
+%  \item оптимизация алгоритмом дифференциальной эволюции,
+%  \item расчет критериев соответствия и отбор модельных структур
+%  \begin{itemize}
+%   \item $R^2$ > 0.995,
+%   \item идентификация режимов работы насоса.
+%  \end{itemize}
+
+% Уравнение для <<Спутник 2>>:
+% 
+% \begin{equation}
+% 	\label{eq:sputnik_2_eq}
+% 	L_2\frac{dQ}{dt} = a_2Q + b_2\omega^2 + c_2H + d_2HQ^3 + e_2\omega^{-1}Q.
+% \end{equation}
+% %}
+% \end{frame}
+% 
+% \begin{frame}{Точность оценки расхода РНК}
+% 
+% \setcounter{table}{0}
+% \begin{table}
+% \caption{Точность оценки расхода для роторных насосов крови <<Спутник 1>> и <<Спутник 2>> (\%)}\vskip-5pt
+% \small
+% \begin{tabular}{lrrrr}
+% \toprule
+%  & Спутник 1 & & Спутник 2 & \\
+% \midrule
+%     	Скорость & cF 0,5 & cF 0,25 & cF 0,5 & cF 0,25 \\
+% 		\midrule
+% 		5800 & 45,4	 & 85,5 & 82,3 & 95,8 \\
+% 		6200 & 95,4 & 87,8 & 60,9 & 79,9 \\
+%     	6600 & 98,4 & 90,9 & 88,2 & 91,2 \\
+% 		7000 & 98,9 & 93,0 & 79,2 & 99,1 \\
+%     	7400 & 98,0 & 93,7 & 90,0 & 96,1 \\
+% 		7800 & 97,6 & 93,4 & 97,8 & 95,3 \\
+% 		8200 & 97,9 & 94,1 & 99,4 & 94,6 \\
+% 		8600 & 99,9 & 95,1 & 98,1 & 95,1 \\
+% 		9000 & 99,6 & 96,7 & 97,7 & 96,2 \\
+% 		9400 & 99,6 & 99,5 & 98,5 & 98,8 \\
+% 		9800 & 99,5 & 99,6 & 99,0 & 98,8 \\
+% 		\midrule
+% 		Среднее & 93,7 & 93,6 & 90,1 & 94,6 \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+% 
+% % \footnotesize
+% % \begin{equation}
+% % 	\left( 1 - (Q_M - Q_E)/Q_M \right) \cdot 100 \%,
+% % \end{equation}
+% % 
+% % \small где $Q_M$ -- расход насоса, измеренный датчиком, $Q_E$ -- расход насоса, оцененный с помощью модели насоса.
+% 
+% \end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Точность определения режимов работы РНК}
+% 
+% % \only<1>{
+% % \begin{table}
+% % \caption{Список производных}
+% % \begin{tabular}{lrr}
+% % \toprule
+% %  & Спутник 1 & Спутник 2\\
+% % \midrule
+% % 								&	$\Delta Q$ / $\delta_Q$	&	cF 0.5/0.25\\
+% % $P_{BF}$					& $dQ/dt~dQ/dH$		& $d^4Q/dt^4$\\
+% % $P_{PA}/P_{FA}$	& $dQ/dt~dQ/dH$		& $d^3Q/dt^3$\\
+% % 								& $d^2Q/dt^2~dQ/dH$		& $d^2Q/dt^2~dQ/dH$\\
+% % $P_{VC}$				& $d^2Q/dt^2$			& $dQ/dt~dQ/d\omega$\\
+% % \bottomrule
+% % \end{tabular}
+% % \end{table}
+% % }
+% 
+% % \only<1>{
+% % \begin{figure}
+% %   \center
+% %   \includegraphics[scale=0.61]{images/ps_present}
+% %   \caption{Пример определения режимов обратного течения крови ($P_{BF}$) для насоса <<Спутник 1>> и коллапса желудочка сердца ($P_{VC}$) для насоса <<Спутник 2>> в состояниях cF 0.5 (\textcolor{blue}{\rule[1 mm]{4 mm}{.8pt}}) и cF 0.25 (\textcolor{blue}{\rule[1 mm]{2 mm}{.8pt} \rule[1 mm]{2 mm}{.8pt}}); $Q_{min}$ -- минимальная величина потока через насос (Л/мин), $P_{LVED}$ -- конечно-диастолическое давление левого желудочка сердца (мм рт. ст.), $BF1(dQ/dt~d^3Q/d\omega^3)$ и $VC1(dQ/dt~d^2Q/d\omega^2)$ -- индексы производных} 
+% % \end{figure}
+% % }
+% % 
+% % \only<2>{
+% % \setcounter{table}{0}
+% % \begin{table}
+% % \caption{Точность определения режимов работы для роторных насосов крови <<Спутник 1>> и <<Спутник 2>> (\%)}
+% % \begin{tabular}{lrrrr}
+% % \toprule
+% %  & Спутник 1 & & Спутник 2 & \\
+% % \midrule
+% % 			&	cF 0,5	& cF 0,25 &	cF 0,5 & cF 0,25\\
+% % \midrule
+% % $P_{BF}$					& 91,7			&	91,7			& 100,0		& 100,0\\
+% % $P_{PA}/P_{FA}$	& 100,0		&	100,0		& 100,0		& 100,0\\
+% % $P_{VC}$				& 	100,0		&	100,0		& 91,7			& 91,7 \\
+% % \bottomrule
+% % \end{tabular}
+% % \end{table}
+% 
+% \end{frame}
+
+% ------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}{Результаты проверки критериев оценки эффективности идентификации}
+\tiny
+
+\begin{minipage}[ht]{0.56\textwidth} 
+
+%\vskip-185pt
+\underline{\textbf{Алгоритм структурно-параметрической идентификации для Спутник}}: \vskip2pt
+
+Критерии оценки эффективности идентификации:
+\begin{itemize}
+ \item \vskip-3pt точность оценки расхода насоса $\delta(Q)$,
+ \item \vskip-3pt точность определения перехода между режимами работы $\delta(PS)$.
+\end{itemize}
+
+\vskip4pt
+\begin{tikzpicture}[node distance=0.8cm,overlay]
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=1.0cm, minimum height=0.6cm,text centered, draw=black, fill=gray!10,xshift=2.5cm,yshift=-5.2]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=0.9cm, minimum height=0.6cm, text centered, draw=black, fill=gray!10]
+\tikzstyle{process} = [rectangle, minimum width=1.1cm, minimum height=0.5cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{decision} = [diamond, minimum width=1.5cm, minimum height=0.65cm, text centered, draw=black, fill=gray!10]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\node (start) [startstop] {\parbox{3.1cm}{Задание пороговых величин для критериев оценки эффективности идентификации и исходного уравнения $y_i$ где $i$ -- номер итерации}};
+\node (in1) [io, below of=start, yshift=-9.00] {\parbox{2.5cm}{Добавление к $y_i$ члена вида $k\omega^xH^yQ^z$ где $k$ -- коэффициент \\ $x$, $y$ и $z$ $\in [-2 .. 4]$ }};
+\node (pro1) [process, below of=in1, yshift=-16.0] {\parbox{3.7cm}{Оптимизация коэффициентов $y_i + k\omega^xH^yQ^z$ для состояния cF 0,5 с использованием процедуры на основе алгоритма дифференциальной эволюции \\ Проверка соответствия критериям оценки эффективности идентификации $\delta(Q)$ и $\delta(PS)$}};
+\node (dec1) [decision, below of=pro1, yshift=-0.5cm] {};% {\footnotesize\bf \parbox{1.5cm}{Соответствие \\ критериям}};
+\node (dec2) [decision, below of=dec1, yshift=-0.08cm] {};
+\node (out2a) [process, right of=dec2, xshift=1.7cm, minimum width=1.0cm, fill=yellow!40] {\parbox{2.0cm}{Задание $y_i + k\omega^xH^yQ^z$ исходным уравнением \\ $i = i + 1$ \\ $j = j + 1$}};
+\node (out2b) [process, left of=dec1, xshift=-1.4cm, minimum width=1.0cm, fill=red!40] {\parbox{2.2cm}{Исключение $y_i + k\omega^xH^yQ^z$ \\ $j = j + 1$}};
+\node (out2c) [startstop, below of=dec2, xshift=-2.5cm, yshift=0.15cm, minimum height=0.5cm, fill=green!40] {\parbox{2.5cm}{Окончательное $y_i + k\omega^xH^yQ^z$}};
+% \node (stop) [startstop, below of=dec1, yshift=-1.1cm, fill=green!40, yshift=-0.1cm] {\small Окончательное $y_i + kx_j$};
+
+\draw [arrow] (start) -- (in1);
+\draw [arrow] (in1) -- (pro1);
+\draw [arrow] (pro1) -- (dec1);
+\draw [arrow] (dec2) -- node[anchor=south] {нет} (out2a);
+\draw [arrow] (dec1) -- node[anchor=south] {~~~~~~нет} (out2b);
+\draw [arrow] (dec1) -- node[anchor=west] {~~да} (dec2);
+\draw [arrow] (dec2) -- node[anchor=west] {~~да} (out2c);
+\draw [arrow] (out2a) |- ($(in1.east)+(0,-0.1)$);
+\draw [arrow] (out2b) |- ($(in1.west)+(0.05,0.1)$);
+%\draw [arrow] (out2b) ($(out2b.east)$)|- + (2.5,0) |- ($(in1.east)+(0.05,0.1)$); 
+\draw (2.5, -3.95) node {$\delta(Q) | \delta(PS)$}; %  \\ $\delta(PS) \geq 85\%$
+\draw (2.5, -4.85) node {$\delta(Q)~\&~\delta(PS)$}; %  \\ $\delta(PS) \geq 85\%$
+
+\end{tikzpicture}
+
+\tiny \vskip170pt
+Построенные математические модели насосов исследованы на математической модели сердечно-сосудистой системы:
+
+\begin{itemize}
+ \item \vskip-4pt $\delta(P_{BF}/P_{PA})$ более 92\%,	 $\delta(P_{PA}/P_{FA})$ -- 100\%	\vskip-5pt
+ \item \vskip-2pt невозможно определение $P_{VC}$ из-за постоянства скорости насоса.	\vskip-5pt
+\end{itemize}
+
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.42\textwidth}
+
+\vskip0pt
+Структура исходного уравнения:
+
+\vskip-4pt
+\begin{equation}
+LdQ/dt =  aQ + b\omega^2 + cH.
+\end{equation}
+
+\vskip-2pt
+С использованием алгоритма структурно-параметрической идентификации построены математические модели, которые обеспечивают соответствие заданным пороговым величинам для критериев оценки эффективности идентификации.
+
+\vskip5pt
+
+Математическая модель Спутник 1:
+
+\vskip-8pt
+\begin{equation}
+	L_1\frac{dQ}{dt} = a_1Q + b_1\omega^2 + c_1H + d_1HQ + e_1\omega^{-1} H^2 Q.
+\end{equation}
+
+Математическая модель Спутник 2:
+
+\vskip-8pt
+\begin{equation}
+	L_2\frac{dQ}{dt} = a_2Q + b_2\omega^2 + c_2H + d_2HQ^3 + e_2\omega^{-1}Q.
+\end{equation}
+
+\vskip-18pt
+
+\setcounter{table}{0}
+\begin{table}
+\caption{\tiny Точность оценки расхода насоса ($\delta(Q)$, \%) и точность определения перехода между режимами работы насоса ($\delta(PS)$, \%)}\vskip-9pt
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{Спутник 1} & \multicolumn{2}{c}{Спутник 2} \\
+\midrule
+    	 & cF 0,5 & cF 0,25 & cF 0,5 & cF 0,25 \\
+		\midrule
+		Среднее $\delta(Q)$ & 93,7 & 93,6 & 90,1 & 94,6 \\
+		\midrule
+$\delta(P_{BF}/P_{PA})$		& 91,7			&	91,7			& 100,0		& 100,0\\
+$\delta(P_{PA}/P_{FA})$		& 100,0		&	100,0		& 100,0		& 100,0\\
+$\delta(P_{FA}/P_{VC})$		& 	100,0		&	100,0		& 91,7			& 91,7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vskip-2pt
+\centering~~~~~~~\large \bf \textcolor{green!70}{Соответствие критериям!}
+
+% \begin{table}
+% \caption{\scriptsize Точность определения перехода между режимами работы насоса ($\delta(PS)$, \%)}\vskip-5pt
+% \begin{tabular}{lrrrr}
+% \toprule
+%  & \multicolumn{2}{c}{Спутник 1} & \multicolumn{2}{c}{Спутник 2} \\
+% \midrule
+% 			&	cF 0,5	& cF 0,25 &	cF 0,5 & cF 0,25\\
+% 
+% \end{tabular}
+% \end{table}
+
+\end{minipage}
+
+\end{frame}
+
+% ------------------------------------------------------------------------------------------------------------------------
+
+% \begin{frame}{Результаты проверки критериев оценки эффективности идентификации}
+% 
+% \begin{minipage}[ht]{0.40\textwidth}
+% \scriptsize
+% 
+% \vskip2pt
+% В результате построены математические модели, которые обеспечивают соответствие заданным пороговым величинам для критериев оценки эффективности идентификации.
+% 
+% \vskip4pt
+% Математическая модель насоса Спутник 1 описывается следующим уравнением:
+% 
+% \vskip-8pt
+% \begin{equation*}
+% 	L_1\frac{dQ}{dt} = a_1Q + b_1\omega^2 + c_1H + d_1HQ + e_1\omega^{-1} H^2 Q
+% \end{equation*}
+% 
+% Математическая модель насоса Спутник 2 описывается следующим уравнением:
+% 
+% \vskip-8pt
+% \begin{equation*}
+% 	L_2\frac{dQ}{dt} = a_2Q + b_2\omega^2 + c_2H + d_2HQ^3 + e_2\omega^{-1}Q
+% \end{equation*}
+% 
+% %где $L$ -- параметр, характеризующий влияние инерции жидкости в насосе, $Q$ -- расход насоса, $\omega$ -- скорость вращения ротора насоса, $H$ -- перепад давления в насосе, $a$--$e$ -- коэффициенты.
+% 
+% \vskip0pt
+% \large \bf \textcolor{green!70}{Соответствие критериям!}
+% 
+% \scriptsize \normalfont\vskip5pt
+% Построенные математические модели насосов исследованы на математической модели сердечно-сосудистой системы:
+% 
+% \begin{itemize}
+%  \item точность определения перехода $P_{BF}/P_{PA}$ более 92\%,		\vskip-5pt
+%  \item точность определения перехода $P_{PA}/P_{FA}$ -- 100\%,			\vskip-5pt
+%  \item невозможно определение $P_{VC}$ из-за постоянства скорости насоса.	\vskip-5pt
+% \end{itemize}
+% 
+% \end{minipage}
+% \hfill
+% \begin{minipage}[ht]{0.56\textwidth}
+% 
+% \scriptsize\vskip-2pt
+% 
+% \setcounter{table}{0}
+% \begin{table}
+% \caption{\scriptsize Точность оценки расхода насоса ($\delta(Q)$, \%)}\vskip-5pt
+% \begin{tabular}{lrrrr}
+% \toprule
+%  & \multicolumn{2}{c}{Спутник 1} & \multicolumn{2}{c}{Спутник 2} \\
+% \midrule
+%     	Скорость & cF 0,5 & cF 0,25 & cF 0,5 & cF 0,25 \\
+% 		\midrule
+% 		5800 & 45,4	 & 85,5 & 82,3 & 95,8 \\
+% 		6200 & 95,4 & 87,8 & 60,9 & 79,9 \\
+%     	6600 & 98,4 & 90,9 & 88,2 & 91,2 \\
+% 		7000 & 98,9 & 93,0 & 79,2 & 99,1 \\
+%     	7400 & 98,0 & 93,7 & 90,0 & 96,1 \\
+% 		7800 & 97,6 & 93,4 & 97,8 & 95,3 \\
+% 		8200 & 97,9 & 94,1 & 99,4 & 94,6 \\
+% 		8600 & 99,9 & 95,1 & 98,1 & 95,1 \\
+% 		9000 & 99,6 & 96,7 & 97,7 & 96,2 \\
+% 		9400 & 99,6 & 99,5 & 98,5 & 98,8 \\
+% 		9800 & 99,5 & 99,6 & 99,0 & 98,8 \\
+% 		\midrule
+% 		Среднее & 93,7 & 93,6 & 90,1 & 94,6 \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+% 
+% \vskip-15pt
+% 
+% \begin{table}
+% \caption{\scriptsize Точность определения перехода между режимами работы насоса ($\delta(PS)$, \%)}\vskip-5pt
+% \begin{tabular}{lrrrr}
+% \toprule
+%  & \multicolumn{2}{c}{Спутник 1} & \multicolumn{2}{c}{Спутник 2} \\
+% \midrule
+% 			&	cF 0,5	& cF 0,25 &	cF 0,5 & cF 0,25\\
+% \midrule
+% $\delta(P_{BF}/P_{PA})$		& 91,7			&	91,7			& 100,0		& 100,0\\
+% $\delta(P_{PA}/P_{FA})$		& 100,0		&	100,0		& 100,0		& 100,0\\
+% $\delta(P_{FA}/P_{VC})$		& 	100,0		&	100,0		& 91,7			& 91,7 \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+% 
+% \end{minipage}
+% 
+% \end{frame}
+
+\begin{frame}{Управление имплантируемым роторным насосом крови}
+\scriptsize
+
+В результате проведенного комплексного исследования взаимодействия математических моделей идентификации и сердечно-сосудистой системы разработан \underline{способ управления роторным насосом крови}. %\footnotemark[1]$^,$\footnotemark[2]
+
+\begin{minipage}[ht]{0.49\textwidth}
+\begin{figure}
+\center{\includegraphics[width=0.99\linewidth]{../images/control_algorithm_mod}}
+\caption{\scriptsize Обобщенная структура системы управления скоростью роторного насоса крови; \tiny \\$H$ -- перепад давления в насосе, $\omega$ -- скорость вращения ротора насоса, $\mu$ -- вязкость жидкости, $Q$ -- расход жидкости} % добавить расшифровку символов?
+\end{figure}
+
+\scriptsize \vskip-5pt
+Для оценки расхода и определения режимов работы на основе известных $H$, $\omega$ и $\mu$ используется разработанная модель идентификации насоса HeartMate II:
+
+\vskip-10pt
+\begin{equation}
+	\setcounter{equation}{1}
+	L\frac{dQ}{dt} = aQ + b\omega^2 + cQ^2 + dQ^3 + eQ\omega^2 + fQ^2\omega + g - H.
+\end{equation}
+
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.49\textwidth}
+\vskip2pt
+\begin{figure}
+\center{\includegraphics[width=0.99\linewidth]{../images/c4_waveform_vc}}
+\vskip-6pt\caption{\tiny Пример управления скоростью роторного насоса крови $\omega_P$ с целью поддержания заданного уровня расхода $Q_D$ 4,5 л/мин и предотвращения режима коллапса желудочка сердца; $Q_P$ -- расход насоса, $P_{ES}$ -- конечно-систолическое давление в желудочке сердца, $S_{VC}$ -- индекс для определения $P_{VC}$ на основе производной $dQ/dt$} % добавить расшифровку символов?
+\end{figure}
+
+\end{minipage}
+
+\vskip2pt
+%Основной компонент схемы -- \emph{оценочный блок} -- позволяет оценивать расход и определять режимы работы с использованием математической модели идентификации РНК 
+
+\vskip-3pt
+Разработанный способ управления с использованием скорости вращения ротора в качестве управляемой переменной \footnotemark[1]$^-$\footnotemark[3] направлен на поддержание заданного уровня расхода насоса и предотвращение следующих нежелательных режимов работы насоса: обратное течение через насос, полная разгрузка желудочка сердца и коллапс желудочка сердца.
+
+\vskip6pt
+
+\footnotetext[1]{\tiny ~\textit{Petukhov D. S.} Simulation and control of the H-Q curves of the Sputnik portable ventricular assist device \textcolor{pGray}{// Biomedical Engineering. 2017. Vol. 50, no. 6. P. 429-432.} }
+
+\footnotetext[2]{\tiny ~\textit{Petukhov D. S., Telyshev D. V., Selishchev S. V.} Control method of a rotary blood pump for a left ventricular assist device \textcolor{pGray}{// Sovremennye tehnologii v medicine 2016. Vol. 8, no. 1. P. 28-33.}}
+
+\footnotetext[3]{\tiny ~\textit{Petukhov D. S., Telyshev D. V.} Design concept of patient-adaptive control method for a ventricular assist device \textcolor{pGray}{// 37th Annual International Conference of the IEEE Engineering in Medicine and Biology Society. 2015. P. 116.} }
+
+% $\bf P_{BF}$ -- режим обратного течения через насос, $\bf P_{PA}$ -- режим частичной разгрузки желудочка сердца, $\bf P_{FA}$ -- режим полной разгрузки желудочка сердца, $\bf P_{PVC}$ -- режим частичного коллапса желудочка сердца, $\bf P_{FVC}$ -- режим полного коллапса желудочка сердца.
+
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}{Внедрение результатов диссертационной работы}
+
+\begin{minipage}[ht]{0.46\textwidth}
+\scriptsize
+Результаты диссертационной работы:
+
+\begin{itemize}
+ \item использованы при реализации следующих проектов и исследований:
+ \begin{itemize} \tiny
+  \item проект Российского научного фонда \\ № 14-39-00044 <<Разработка адаптивной системы вспомогательного кровообращения с целью персонализации лечения острой формы сердечной недостаточности>> (2014 - 2016 гг.),
+  \item прикладные научные исследования по теме <<Разработка аппарата длительного механического замещения функции сердца>> (RFMEFI57814X0057) (2014 - 2016 гг.),
+  \item прикладные научные исследования и экспериментальные разработки по теме <<Миниатюризация имплантируемых насосов крови для их применения в педиатрической кардиохирургии>> \\ (RFMEFI58115X0014) (2015 - 2017 гг.).
+ \end{itemize}
+% \item внедрены в учебный процесс кафедры биомедицинских систем Национального исследовательского университета <<МИЭТ>> в рамках дисциплины <<Биомедицинская инженерия искусственных органов>>
+\end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.52\textwidth}
+\scriptsize \vskip-8pt
+Акты о внедрении результатов диссертационной работы
+\begin{figure}
+%\center{\includegraphics[width=0.49\linewidth,angle=90,origin=c]{../images/act_1}} 
+\includegraphics[width=0.75\linewidth,angle=-90,origin=c]{../images/act_22} \includegraphics[width=0.75\linewidth,angle=-90,origin=c]{../images/act_11}
+%\center{\includegraphics[width=0.49\linewidth]{../images/act_2}}
+%\vskip-6pt\caption{\tiny Пример управления скоростью роторного насоса крови $\omega_P$ с целью поддержания заданного уровня расхода $Q_D$ и предотвращения режима коллапса желудочка сердца; $Q_P$ -- расход насоса, ЧСС -- частота сердечных сокращений} % добавить расшифровку символов?
+\end{figure}
+
+\end{minipage}
+\scriptsize
+\begin{itemize}
+ \item внедрены в учебный процесс института биомедицинских систем Национального исследовательского университета <<МИЭТ>> в рамках дисциплины <<Биомедицинская инженерия искусственных органов>> для магистров, обучающихся по направлению 12.04.04 <<Биотехнические системы и технологии>>
+\end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}{Апробация диссертационной работы}
+\footnotesize
+
+Основные результаты работы были представлены на 18 всероссийских и международных конференциях:
+
+\begin{itemize}
+ \item 44th Annual ESAO and 7th IFAO Congress (г. Вена, Австрия, 2017),
+ \item 2nd International Symposium <<Physics, Engineering and Technologies for Biomedicine>> \\(г. Москва, 2017),
+ \item 20-23-я всероссийская конференция <<Микроэлектроника и информатика>> (г. Москва, 2013 -- 2016),
+ \item 61-62nd ASAIO Annual Conference (г. Чикаго, США, 2015; г. Сан-Франциско, США, 2016),
+ \item 24th Congress of the International Society for Rotary Blood Pumps (г. Мито, Япония, 2016),
+ \item X-XI German-Russian Conference on Biomedical Engineering (г. Санкт-Петербург, 2014; \\г. Ахен, Германия, 2015),
+ \item 42th Annual ESAO Congress (г. Лёвен, Бельгия, 2015),
+ \item 37th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (г. Милан, Италия, 2015),
+ \item 16-я научно-техническая конференция <<МедТех>> (о. Кефалония, Греция, 2014),
+ \item 11-я международная конференция <<Физика и радиоэлектроника в медицине и экологии>> (г. Суздаль, 2014),
+ \item 6-я Троицкая конференция <<Медицинская физика и инновации в медицине>> (г. Троицк, 2014).
+\end{itemize}
+
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{Список основных публикаций}
+
+\scriptsize
+
+Основные результаты работы были опубликованы в 11 рецензируемых научных изданиях, входящих в перечень Высшей аттестационной комиссии при Министерстве образования и науки Российской Федерации: 
+
+\begin{enumerate}%[leftmargin=25pt, itemsep=12pt] %[leftmargin=2em, itemsep=2em]
+  \item Петухов Д. С., Телышев Д. В. Исследование роторного насоса для поддержки кровообращения правого желудочка сердца при механической поддержке кровообращения обоих желудочков сердца // Медицинская техника. 2017. № 1. С. 24--26.
+  \item Петухов Д. С. Моделирование и управление расходно-напорными характеристиками имплантируемого насоса крови АВК-Н <<Спутник>> // Медицинская техника. 2016. № 6. С. 52--55.
+  \item Петухов Д. С., Телышев Д. В. Математическая модель сердечно-сосудистой системы педиатрических пациентов с врожденными пороками сердца // Медицинская техника. 2016. № 4. С. 9--11.
+  \item Петухов Д. С., Телышев Д. В. Алгоритмы управления роторными аппаратами вспомогательного кровообращения // Медицинская техника. 2016. № 3. С. 8--11.
+  \item Петухов Д. С., Телышев Д. В., Селищев С. В. Метод управления роторным насосом крови для системы вспомогательного кровообращения левого желудочка сердца // Современные технологии в медицине. 2016. Т. 8, № 1. С. 28--33.
+  \item Петухов Д. С., Телышев Д. В. Исследование чувствительности роторного насоса крови <<Спутник>> к преднагрузке и постнагрузке // Медицинская техника. 2015. № 6. С. 27--30.
+  \item Петухов Д. С., Селищев С. В., Телышев Д. В. Перспективы развития технологий полной замены функции сердца с помощью механических систем
+поддержки кровообращения // Медицинская техника. 2015. № 5. С. 5--8.
+  \item Петухов Д. С., Селищев С. В., Телышев Д. В. Полностью искусственное сердце: современное состояние // Медицинская техника. 2015. № 4. С. 1--4.
+  \item Петухов Д. С., Телышев Д. В. Моделирование изменений в динамике течения крови через имплантируемый осевой насос // Медицинская техника. 2014. № 6. С. 44--47.
+  \item Петухов Д. С., Селищев С. В., Телышев Д. В. Развитие аппаратов вспомогательного кровообращения левого желудочка сердца как наиболее эффективный способ лечения острой сердечной недостаточности // Медицинская техника. 2014. № 4. С. 37--39.
+  \item Петухов Д. С., Селищев С. В. Оценка изменений в работе правого желудочка сердца при наличии аппарата вспомогательного кровообращения левого желудочка сердца // Медицинская техника. 2014. № 4. С. 28--32.
+\end{enumerate}
+
+\end{frame}
+
+% ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+\begin{frame}{Основные результаты и выводы}
+%\small
+%\scriptsize
+\scriptsize
+\input{../common/concl}
+
+% \begin{enumerate}
+%   \item Разработана математическая модель роторного насоса крови с целью косвенной оценки потока через насос, учитывающая инерционные и вязкостные эффекты крови.
+%   \item Разработан метод определения режимов работы роторного насоса крови на основе его математической модели, который продемонстрировал точность не менее 80 \% при тестировании на модели сердечно-сосудистой системы.
+%   \item Разработан алгоритм управления роторным насосом крови, который удовлетворяет основным требованиям по регулированию работы насоса для аппаратов вспомогательного кровообращения, используемых в клинической практике.
+%   \item Предложен алгоритм разработки математической модели роторного насоса крови с использованием результатов испытаний роторных насосов в динамических условиях, который обеспечил среднюю точность оценки расхода насоса не менее 90 \%.
+%   \item Разработанный метод определения режимов работы роторного насоса крови проверен с использованием результатов испытаний двух поколений роторных насосов на гидродинамическом стенде в двух состояниях, соответствующих различным степеням сердечной недостаточности, продемонстрировав точность не менее 90 \%.
+% \end{enumerate}
+
+  %\begin{center}\ccbysa\end{center}
+
+\end{frame}
+
+\end{document} 

@@ -1,0 +1,57 @@
+\documentclass[a4paper,14pt]{extarticle} %,twoside
+
+% убрать 6-й вывод
+
+\input{setup}               % Упрощённые настройки шаблона 
+
+\input{../common/packages}  % Пакеты общие для диссертации и автореферата
+\input{synpackages}         % Пакеты для автореферата
+\input{userpackages}        % Пакеты для специфических пользовательских задач
+\input{../common/styles}    % Стили общие для диссертации и автореферата
+\input{synstyles}           % Стили для автореферата
+\input{userstyles}          % Стили для специфических пользовательских задач
+%\input{../biblio/bibliopreamble}% Настройки библиографии из внешнего файла (там же выбор: встроенная или на основе biblatex)
+%\input{../biblio/biblatex}
+\input{../biblio/predefined}
+\input{../common/data}      % Основные сведения
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning}
+\usetikzlibrary{shapes.geometric,calc,chains}
+
+\usetikzlibrary{arrows.meta}
+% \tikzset{
+%   double arrow/.style args={#1 colored by #2 and #3}{
+%     -stealth,line width=#1,#2, % first arrow
+%     postaction={draw,-stealth,#3,line width=(#1)/3,
+%                 shorten <=(#1)/3,shorten >=2*(#1)/3}, % second arrow
+%   }
+% }
+% \usepackage[export]{adjustbox}
+
+% -------------------------------- Bibliography 
+%\NewBibliographyString{langjapanese}
+%\NewBibliographyString{fromjapanese}
+
+%\usepackage[justification=centering]{caption}
+%\setlength{\baselineskip}{1.0}
+
+%\usepackage{layout}
+%\usepackage{showframe}
+
+\begin{document}
+
+%\layout{}
+
+\input{title}           % Титульный лист
+\input{content}         % Содержание автореферата
+
+%\printbibliography
+%\nocite{*}
+
+%\nocite{mt1_2017, mt6_2016, mt4_2016, mt3_2016, stm_2016, mt6_2015, mt5_2015, mt4_2015, mt6_2014_main, mt6_2014, mt4_2014}
+%\nocite{physbio_2017, esao_2017, isrbp_2016, rgc_2016, asaio_2016, miee_2016, esao_2015, embc_2015_2, embc_2015_1, asaio_2015, rgc_2015, miee_2015, medtech_2014, freme_2014, rgc_2014, tkmf_2014, miee_2014}
+%\nocite{mt4_2014, mt6_2014_main, mt6_2014, mt4_2015, mt5_2015, mt6_2015, stm_2016}
+%\nocite{aissaoui2014comparison,Lo_2015_RVF,Lampert20151123,JTD1934,Dandel2015241,Loforte_2013,Karimov2016651,Potapov20161268,selishchev2015ventricular,giridharan2014axial,sputnik_upd}
+%\nocite{Krabatsch13092011,kirklin2010second,Schmitto20121223,Aissaoui2013186,morgan2013impact,ClevelandJr2011862,Saito2011475}
+\end{document}
